@@ -48,7 +48,7 @@ function getFloodStyle(notation) {
   };
 }
 
-function loadGeoJSON(url, style, layerName, description, map, allLayers) {
+function loadGeoJSON(url, style, layerName, description, map, allLayers, targetGroup) {
   fetch(url)
     .then(response => {
       if (!response.ok) {
@@ -75,7 +75,18 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers) {
               polygonStyle = getFloodStyle(feature.properties.notation);
             }
             
-            var polygon = L.polygon(leafletCoords, polygonStyle).addTo(map);
+            var polygon = L.polygon(leafletCoords, polygonStyle);
+            
+            // Zu Gruppe hinzufügen basierend auf Notation oder targetGroup
+            if (feature.properties && feature.properties.notation === 'Flooded area') {
+              polygon.addTo(layerGroups.floodedArea);
+            } else if (feature.properties && feature.properties.notation === 'Flood trace') {
+              polygon.addTo(layerGroups.floodTrace);
+            } else if (targetGroup) {
+              polygon.addTo(targetGroup);
+            } else {
+              polygon.addTo(map);
+            }
 
             var popupContent = `<b>${layerName}</b><br>`;
             popupContent += `<i>${description}</i><br>`;
@@ -109,7 +120,14 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers) {
               fillColor: pointColor,
               fillOpacity: 0.8,
               weight: 1
-            }).addTo(map);
+            });
+            
+            // Zu entsprechender Gruppe hinzufügen basierend auf Schadensgrad
+            if (targetGroup) {
+              circleMarker.addTo(targetGroup);
+            } else {
+              circleMarker.addTo(map);
+            }
 
             var popupContent = `<b>${layerName}</b><br>`;
             
@@ -159,7 +177,8 @@ function loadRapidMappingData(map, allLayers) {
     'Area of Interest A',
     'AOI - Untersuchungsgebiet',
     map,
-    allLayers
+    allLayers,
+    layerGroups.aoi
   );
 
   // Observed Event A (Überschwemmungsgebiet)
@@ -170,7 +189,8 @@ function loadRapidMappingData(map, allLayers) {
     'Überschwemmungsgebiet',
     'Observed Event A',
     map,
-    allLayers
+    allLayers,
+    null // Wird automatisch aufgeteilt in floodedArea und floodTrace
   );
 
   // Built Up Points (Gebäude mit Schadensgrad)
@@ -180,6 +200,149 @@ function loadRapidMappingData(map, allLayers) {
     'Gebäude',
     'Residential Buildings',
     map,
-    allLayers
+    allLayers,
+    layerGroups.buildings
   );
+}
+
+// Erweiterte Layer Control mit Hierarchie erstellen
+function createCustomLayerControl(map) {
+  var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
+  controlDiv.innerHTML = `
+    <div class="legend-header">
+      <strong>Rapid Mapping</strong>
+      <div class="legend-subtitle">Ortssituation am 20/07/2021, 10:35 Uhr</div>
+      <div class="legend-info">
+        <small>
+          Event: 13/07/2021 16:00<br>
+          Activation: 13/07/2021 17:11<br>
+          Map production: 11/08/2021
+        </small>
+      </div>
+    </div>
+    
+    <div class="legend-section">
+      <label class="legend-item">
+        <input type="checkbox" class="layer-toggle" data-layer="aoi" checked>
+        <span class="layer-name">1.1 Untersuchungsgebiet</span>
+        <span class="legend-symbol" style="border: 2px solid #7e0909ff; background: transparent;"></span>
+      </label>
+    </div>
+    
+    <div class="legend-section">
+      <div class="legend-category">
+        <span class="toggle-icon">▼</span>
+        <label>
+          <input type="checkbox" class="category-toggle" data-category="buildings" checked>
+          <strong>1.2 Betroffene Gebäude</strong>
+        </label>
+      </div>
+      <div class="legend-subcategory" data-category="buildings">
+        <label class="legend-item">
+          <span class="layer-name">1.2.1 Möglicherweise beschädigt</span>
+          <span class="legend-symbol" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
+        </label>
+        <label class="legend-item">
+          <span class="layer-name">1.2.2 Beschädigt</span>
+          <span class="legend-symbol" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
+        </label>
+        <label class="legend-item">
+          <span class="layer-name">1.2.3 Zerstört</span>
+          <span class="legend-symbol" style="background: #3d070758; border: 1px solid #3d0707;"></span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="legend-section">
+      <div class="legend-category">
+        <span class="toggle-icon">▼</span>
+        <label>
+          <input type="checkbox" class="category-toggle" data-category="flood" checked>
+          <strong>1.3 Überschwemmungsgebiet</strong>
+        </label>
+      </div>
+      <div class="legend-subcategory" data-category="flood">
+        <label class="legend-item">
+          <input type="checkbox" class="layer-toggle" data-layer="floodedArea" checked>
+          <span class="layer-name">1.3.1 Flooded Area</span>
+          <span class="legend-symbol" style="background: #3399ff; border: 2px solid #0066cc;"></span>
+        </label>
+        <label class="legend-item">
+          <input type="checkbox" class="layer-toggle" data-layer="floodTrace" checked>
+          <span class="layer-name">1.3.2 Flood Trace</span>
+          <span class="legend-symbol" style="background: #00cccc; border: 1px solid #006666;"></span>
+        </label>
+      </div>
+    </div>
+  `;
+
+  // Event Listeners für Layer-Toggles
+  controlDiv.querySelectorAll('.layer-toggle').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      var layerName = this.getAttribute('data-layer');
+      if (this.checked) {
+        map.addLayer(layerGroups[layerName]);
+      } else {
+        map.removeLayer(layerGroups[layerName]);
+      }
+    });
+  });
+
+  // Event Listeners für Kategorie-Toggles
+  controlDiv.querySelectorAll('.category-toggle').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      var category = this.getAttribute('data-category');
+      if (category === 'buildings') {
+        if (this.checked) {
+          map.addLayer(layerGroups.buildings);
+        } else {
+          map.removeLayer(layerGroups.buildings);
+        }
+      } else if (category === 'flood') {
+        var subcategory = this.closest('.legend-section').querySelector('.legend-subcategory');
+        subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
+          if (this.checked) {
+            subCheckbox.checked = true;
+            map.addLayer(layerGroups[subCheckbox.getAttribute('data-layer')]);
+          } else {
+            subCheckbox.checked = false;
+            map.removeLayer(layerGroups[subCheckbox.getAttribute('data-layer')]);
+          }
+        }.bind(this));
+      }
+    });
+  });
+
+  // Toggle Icons für Ein-/Ausklappen
+  controlDiv.querySelectorAll('.legend-category').forEach(function(category) {
+    category.addEventListener('click', function(e) {
+      if (e.target.classList.contains('toggle-icon') || e.target.tagName === 'STRONG') {
+        var icon = this.querySelector('.toggle-icon');
+        var subcategory = this.parentElement.querySelector('.legend-subcategory');
+        if (subcategory.style.display === 'none') {
+          subcategory.style.display = 'block';
+          icon.textContent = '▼';
+        } else {
+          subcategory.style.display = 'none';
+          icon.textContent = '▶';
+        }
+      }
+    });
+  });
+
+  var CustomControl = L.Control.extend({
+    options: {
+      position: 'topright'
+    },
+    onAdd: function(map) {
+      return controlDiv;
+    }
+  });
+
+  new CustomControl().addTo(map);
+  
+  // Alle Layer-Gruppen initial zur Karte hinzufügen
+  Object.values(layerGroups).forEach(function(group) {
+    map.addLayer(group);
+  });
 }

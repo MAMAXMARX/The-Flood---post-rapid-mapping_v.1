@@ -40,10 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Standard-Karte beim Start anzeigen
   osmStandard.addTo(map);
 
-  // Zentrums-Marker
-  //var marker = L.marker([50.450453753490834, 6.888650882405452]).addTo(map);
-  //marker.bindPopup("<b>Schuld</b><br>Zentrum der Betrachtung").openPopup();
-
   // Array für alle Layer
   var allLayers = [];
 
@@ -65,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
   var overlayMaps = {};
 
-  // Layer Control hinzufügen (oben rechts)
+  // Standard Layer Control für Basiskarten hinzufügen (oben rechts)
   L.control.layers(baseMaps, overlayMaps, {
     position: 'topright',
     collapsed: false
@@ -77,7 +73,12 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // Funktion aus RM11.08.21.js aufrufen
   loadRapidMappingData(map, allLayers);
+  
+  // Custom Layer Control für Rapid Mapping Daten erstellen
+  createCustomLayerControl(map);
 
   // Karte nach kurzer Verzögerung neu rendern
-  setTimeout(() => map.invalidateSize(), 100);
+  setTimeout(function() { 
+    map.invalidateSize(); 
+  }, 100);
 });
