@@ -1,6 +1,6 @@
 // ============================================
 // RAPID MAPPING DATEN - 11.08.2021
-// EMSR517 AOI15 - Schuld Flutkatastrophe
+// EMSR517 AOI15 - Ahrtal Flutkatastrophe
 // ============================================
 
 function getDamageColor(damageGrade) {

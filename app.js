@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', function () {
   osmStandard.addTo(map);
 
   // Zentrums-Marker
-  var marker = L.marker([50.450453753490834, 6.888650882405452]).addTo(map);
-  marker.bindPopup("<b>Schuld</b><br>Zentrum der Betrachtung").openPopup();
+  //var marker = L.marker([50.450453753490834, 6.888650882405452]).addTo(map);
+  //marker.bindPopup("<b>Schuld</b><br>Zentrum der Betrachtung").openPopup();
 
   // Array für alle Layer
   var allLayers = [];
