@@ -11,6 +11,115 @@
       height: 1200px;
       width: 100%;
     }
+    
+    /* Custom Layer Control Styling */
+    .custom-layer-control {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      max-width: 350px;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+    }
+    
+    .legend-header {
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .legend-header strong {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .legend-subtitle {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .legend-info {
+      background: #f5f5f5;
+      padding: 8px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+    
+    .legend-info small {
+      font-size: 11px;
+      color: #555;
+      line-height: 1.6;
+    }
+    
+    .legend-section {
+      margin-bottom: 15px;
+    }
+    
+    .legend-category {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 5px 0;
+      user-select: none;
+    }
+    
+    .legend-category:hover {
+      background: #f0f0f0;
+    }
+    
+    .toggle-icon {
+      font-size: 10px;
+      width: 15px;
+      display: inline-block;
+    }
+    
+    .legend-subcategory {
+      margin-left: 25px;
+      margin-top: 8px;
+      padding-left: 10px;
+      border-left: 2px solid #ddd;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      cursor: pointer;
+    }
+    
+    .legend-item:hover {
+      background: #f9f9f9;
+    }
+    
+    .layer-name {
+      flex: 1;
+      font-size: 12px;
+    }
+    
+    .legend-symbol {
+      width: 20px;
+      height: 15px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+    
+    .custom-layer-control input[type="checkbox"] {
+      cursor: pointer;
+    }
+    
+    .custom-layer-control label {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>

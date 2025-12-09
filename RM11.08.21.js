@@ -1,7 +1,15 @@
 // ============================================
 // RAPID MAPPING DATEN - 11.08.2021
-// EMSR517 AOI15 - Ahrtal Flutkatastrophe
+// EMSR517 AOI15 - Schuld Flutkatastrophe
 // ============================================
+
+// Layer-Gruppen für die Legende
+var layerGroups = {
+  aoi: L.layerGroup(),
+  buildings: L.layerGroup(),
+  floodedArea: L.layerGroup(),
+  floodTrace: L.layerGroup()
+};
 
 function getDamageColor(damageGrade) {
   switch(damageGrade) {
@@ -14,6 +22,30 @@ function getDamageColor(damageGrade) {
     default:
       return '#999999';
   }
+}
+
+function getFloodStyle(notation) {
+  if (notation === 'Flooded area') {
+    return {
+      color: '#0066cc',
+      fillColor: '#3399ff',
+      fillOpacity: 0.5,
+      weight: 2
+    };
+  } else if (notation === 'Flood trace') {
+    return {
+      color: '#006666',
+      fillColor: '#00cccc',
+      fillOpacity: 0.3,
+      weight: 1
+    };
+  }
+  // Fallback für andere Notationen
+  return {
+    color: '#9af3ff85',
+    fillOpacity: 0.5,
+    weight: 1
+  };
 }
 
 function loadGeoJSON(url, style, layerName, description, map, allLayers) {
@@ -36,13 +68,25 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers) {
           if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
             var coords = feature.geometry.coordinates[0];
             var leafletCoords = coords.map(coord => [coord[1], coord[0]]);
-            var polygon = L.polygon(leafletCoords, style).addTo(map);
+            
+            // Wenn notation vorhanden ist, speziellen Stil verwenden
+            var polygonStyle = style;
+            if (feature.properties && feature.properties.notation) {
+              polygonStyle = getFloodStyle(feature.properties.notation);
+            }
+            
+            var polygon = L.polygon(leafletCoords, polygonStyle).addTo(map);
 
             var popupContent = `<b>${layerName}</b><br>`;
-            popupContent += `<i>${description}</i><br><br>`;
+            popupContent += `<i>${description}</i><br>`;
+            
+            // Notation hervorheben falls vorhanden
+            if (feature.properties && feature.properties.notation) {
+              popupContent += `<br><b>Typ:</b> ${feature.properties.notation}<br>`;
+            }
             
             if (feature.properties) {
-              popupContent += '<b>Details:</b><br>';
+              popupContent += '<br><b>Details:</b><br>';
               for (var key in feature.properties) {
                 popupContent += `${key}: ${feature.properties[key]}<br>`;
               }
@@ -119,13 +163,10 @@ function loadRapidMappingData(map, allLayers) {
   );
 
   // Observed Event A (Überschwemmungsgebiet)
+  // Wird automatisch nach "Flooded area" (dunkelblau) und "Flood trace" (türkis) unterschieden
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_observedEventA_r1_v3.json',
-    {
-      color: '#9af3ff85',
-      fillOpacity: 0.5,
-      weight: 1
-    },
+    null, // Stil wird automatisch durch getFloodStyle() gesetzt
     'Überschwemmungsgebiet',
     'Observed Event A',
     map,
