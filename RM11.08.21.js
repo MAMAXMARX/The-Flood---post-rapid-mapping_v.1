@@ -224,7 +224,7 @@ function createCustomLayerControl(map) {
     <div class="legend-section">
       <label class="legend-item">
         <input type="checkbox" class="layer-toggle" data-layer="aoi" checked>
-        <span class="layer-name">1.1 Untersuchungsgebiet</span>
+        <span class="layer-name">Untersuchungsgebiet</span>
         <span class="legend-symbol" style="border: 2px solid #7e0909ff; background: transparent;"></span>
       </label>
     </div>
@@ -234,20 +234,20 @@ function createCustomLayerControl(map) {
         <span class="toggle-icon">▼</span>
         <label>
           <input type="checkbox" class="category-toggle" data-category="buildings" checked>
-          <strong>1.2 Betroffene Gebäude</strong>
+          <strong>Betroffene Gebäude</strong>
         </label>
       </div>
       <div class="legend-subcategory" data-category="buildings">
         <label class="legend-item">
-          <span class="layer-name">1.2.1 Möglicherweise beschädigt</span>
+          <span class="layer-name">Möglicherweise beschädigt</span>
           <span class="legend-symbol" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
         </label>
         <label class="legend-item">
-          <span class="layer-name">1.2.2 Beschädigt</span>
+          <span class="layer-name">Beschädigt</span>
           <span class="legend-symbol" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
         </label>
         <label class="legend-item">
-          <span class="layer-name">1.2.3 Zerstört</span>
+          <span class="layer-name">Zerstört</span>
           <span class="legend-symbol" style="background: #3d070758; border: 1px solid #3d0707;"></span>
         </label>
       </div>
@@ -258,18 +258,18 @@ function createCustomLayerControl(map) {
         <span class="toggle-icon">▼</span>
         <label>
           <input type="checkbox" class="category-toggle" data-category="flood" checked>
-          <strong>1.3 Überschwemmungsgebiet</strong>
+          <strong>Überschwemmungsgebiet</strong>
         </label>
       </div>
       <div class="legend-subcategory" data-category="flood">
         <label class="legend-item">
           <input type="checkbox" class="layer-toggle" data-layer="floodedArea" checked>
-          <span class="layer-name">1.3.1 Flooded Area</span>
+          <span class="layer-name">Überflutetes Gebiet</span>
           <span class="legend-symbol" style="background: #3399ff; border: 2px solid #0066cc;"></span>
         </label>
         <label class="legend-item">
           <input type="checkbox" class="layer-toggle" data-layer="floodTrace" checked>
-          <span class="layer-name">1.3.2 Flood Trace</span>
+          <span class="layer-name">Überschwemmungs-Spur</span>
           <span class="legend-symbol" style="background: #00cccc; border: 1px solid #006666;"></span>
         </label>
       </div>
