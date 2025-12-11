@@ -104,14 +104,17 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             var coords = feature.geometry.coordinates[0];
             var leafletCoords = coords.map(coord => [coord[1], coord[0]]);
             
-            // Wenn notation vorhanden ist, speziellen Stil verwenden
+            // Stil-Logik: Reihenfolge ist wichtig!
             var polygonStyle = style;
-            if (feature.properties && feature.properties.notation) {
-              polygonStyle = getFloodStyle(feature.properties.notation);
-            }
-            // Wenn es eine Facility mit Schadensgrad ist
-            else if (feature.properties && feature.properties.damage_gra && targetGroup === layerGroups.facilities) {
+            
+            // 1. Zuerst prüfen ob es eine Facility ist (hat targetGroup facilities)
+            if (feature.properties && feature.properties.damage_gra && targetGroup === layerGroups.facilities) {
               polygonStyle = getFacilityStyle(feature.properties.damage_gra);
+            }
+            // 2. Dann prüfen ob es Flood-Daten mit spezifischer Notation sind
+            else if (feature.properties && feature.properties.notation && 
+                     (feature.properties.notation === 'Flooded area' || feature.properties.notation === 'Flood trace')) {
+              polygonStyle = getFloodStyle(feature.properties.notation);
             }
             
             var polygon = L.polygon(leafletCoords, polygonStyle);
