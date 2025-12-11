@@ -8,8 +8,43 @@ var layerGroups = {
   aoi: L.layerGroup(),
   buildings: L.layerGroup(),
   floodedArea: L.layerGroup(),
-  floodTrace: L.layerGroup()
+  floodTrace: L.layerGroup(),
+  facilities: L.layerGroup()
 };
+
+function getFacilityStyle(damageGrade) {
+  // Für Facilities (Polygone) andere Farben als für Gebäude (Punkte)
+  switch(damageGrade) {
+    case 'Destroyed':
+      return {
+        color: '#8B0000',
+        fillColor: '#8B0000',
+        fillOpacity: 0.4,
+        weight: 2
+      };
+    case 'Damaged':
+      return {
+        color: '#FF6347',
+        fillColor: '#FF6347',
+        fillOpacity: 0.4,
+        weight: 2
+      };
+    case 'Possibly damaged':
+      return {
+        color: '#FFA500',
+        fillColor: '#FFA500',
+        fillOpacity: 0.3,
+        weight: 2
+      };
+    default:
+      return {
+        color: '#999999',
+        fillColor: '#999999',
+        fillOpacity: 0.3,
+        weight: 2
+      };
+  }
+}
 
 function getDamageColor(damageGrade) {
   switch(damageGrade) {
@@ -74,6 +109,10 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             if (feature.properties && feature.properties.notation) {
               polygonStyle = getFloodStyle(feature.properties.notation);
             }
+            // Wenn es eine Facility mit Schadensgrad ist
+            else if (feature.properties && feature.properties.damage_gra && targetGroup === layerGroups.facilities) {
+              polygonStyle = getFacilityStyle(feature.properties.damage_gra);
+            }
             
             var polygon = L.polygon(leafletCoords, polygonStyle);
             
@@ -96,10 +135,27 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
               popupContent += `<br><b>Typ:</b> ${feature.properties.notation}<br>`;
             }
             
+            // Speziell für Facilities: Name und Info hervorheben
+            if (feature.properties && feature.properties.name && targetGroup === layerGroups.facilities) {
+              popupContent += `<br><b>Name:</b> ${feature.properties.name}<br>`;
+            }
+            if (feature.properties && feature.properties.info) {
+              popupContent += `<b>Info:</b> ${feature.properties.info}<br>`;
+            }
+            if (feature.properties && feature.properties.damage_gra) {
+              var damageColor = targetGroup === layerGroups.facilities ? 
+                getFacilityStyle(feature.properties.damage_gra).color : 
+                getDamageColor(feature.properties.damage_gra);
+              popupContent += `<b style="color: ${damageColor}">● Schaden:</b> ${feature.properties.damage_gra}<br>`;
+            }
+            
             if (feature.properties) {
               popupContent += '<br><b>Details:</b><br>';
               for (var key in feature.properties) {
-                popupContent += `${key}: ${feature.properties[key]}<br>`;
+                // Bereits angezeigte Properties überspringen
+                if (key !== 'notation' && key !== 'name' && key !== 'info' && key !== 'damage_gra') {
+                  popupContent += `${key}: ${feature.properties[key]}<br>`;
+                }
               }
             }
             
@@ -203,6 +259,17 @@ function loadRapidMappingData(map, allLayers) {
     allLayers,
     layerGroups.buildings
   );
+
+  // Facilities (Infrastruktur und öffentliche Einrichtungen)
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_facilitiesA_r1_v3.json',
+    null,
+    'Infrastruktur',
+    'Facilities',
+    map,
+    allLayers,
+    layerGroups.facilities
+  );
 }
 
 // Erweiterte Layer Control mit Hierarchie erstellen
@@ -257,6 +324,30 @@ function createCustomLayerControl(map) {
       <div class="legend-category">
         <span class="toggle-icon">▼</span>
         <label>
+          <input type="checkbox" class="category-toggle" data-category="facilities" checked>
+          <strong>Infrastruktur & Einrichtungen</strong>
+        </label>
+      </div>
+      <div class="legend-subcategory" data-category="facilities">
+        <label class="legend-item">
+          <span class="layer-name">Möglicherweise beschädigt</span>
+          <span class="legend-symbol" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
+        </label>
+        <label class="legend-item">
+          <span class="layer-name">Beschädigt</span>
+          <span class="legend-symbol" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
+        </label>
+        <label class="legend-item">
+          <span class="layer-name">Zerstört</span>
+          <span class="legend-symbol" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="legend-section">
+      <div class="legend-category">
+        <span class="toggle-icon">▼</span>
+        <label>
           <input type="checkbox" class="category-toggle" data-category="flood" checked>
           <strong>Überschwemmungsgebiet</strong>
         </label>
@@ -297,6 +388,12 @@ function createCustomLayerControl(map) {
           map.addLayer(layerGroups.buildings);
         } else {
           map.removeLayer(layerGroups.buildings);
+        }
+      } else if (category === 'facilities') {
+        if (this.checked) {
+          map.addLayer(layerGroups.facilities);
+        } else {
+          map.removeLayer(layerGroups.facilities);
         }
       } else if (category === 'flood') {
         var subcategory = this.closest('.legend-section').querySelector('.legend-subcategory');
