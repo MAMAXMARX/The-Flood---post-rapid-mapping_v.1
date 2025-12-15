@@ -165,23 +165,67 @@
       margin: 0;
     }
     
-    /* Leaflet Layer Control Styling (oben links) */
+    /* Leaflet Layer Control Styling (unten links) */
     .leaflet-top.leaflet-left {
       margin-top: 10px;
       margin-left: 10px;
     }
     
     .leaflet-control-layers {
-      font-size: 12px;
       background: white;
       border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      padding: 8px;
     }
     
-    .leaflet-control-layers-base label {
+    .leaflet-control-layers label {
       display: flex;
       align-items: center;
       gap: 6px;
       padding: 4px 0;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .leaflet-control-layers input[type="radio"] {
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      margin: 0;
+    }
+    
+    .leaflet-control-layers-base {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    /* Zoom Control Styling */
+    .leaflet-control-zoom {
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out {
+      background: white;
+      color: #333;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      width: 32px;
+      height: 32px;
+    }
+    
+    .leaflet-control-zoom-in:hover,
+    .leaflet-control-zoom-out:hover {
+      background: #f0f0f0;
+    }
+    
+    /* Custom Layer Control Position */
+    .leaflet-top.leaflet-right {
+      margin-top: 10px;
+      margin-right: 10px;
     }
     
     /* Scrollbar für Legende */
