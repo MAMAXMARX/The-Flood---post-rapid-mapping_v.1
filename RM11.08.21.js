@@ -280,15 +280,16 @@ function createCustomLayerControl(map) {
   var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
   controlDiv.innerHTML = `
     <div class="legend-main-header">
-      <strong>Rapid Mapping EMSR517</strong>
+      <strong>CEMS RAPID MAPPING EMSR517 - AOI15</strong>
     </div>
     
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="19_07">
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
-          <strong>19.07.2021 - Erstaufnahme</strong>
-          <small>Erste Rapid Mapping Daten</small>
+          <strong>Ortssituation am 18/07/2021, 10:50 Uhr</strong>
+          <small>Aktivierung: 13/07/2021, 17:11</small>
+          <small>Kartierung: 19/07/2021</small>
         </div>
       </div>
       <div class="legend-date-content" data-section-content="19_07" style="display: none;"></div>
