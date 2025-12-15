@@ -280,6 +280,14 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         </label>
       </div>
     </div>
+    
+    <div class="legend-info-compact">
+      <small>
+        Event: 13/07/2021 16:00<br>
+        Activation: 13/07/2021 17:11<br>
+        Map production: 19/07/2021
+      </small>
+    </div>
   `;
   
   // Event Listeners für Layer-Toggles (19.07)

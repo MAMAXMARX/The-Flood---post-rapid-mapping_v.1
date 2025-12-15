@@ -283,6 +283,13 @@ function createCustomLayerControl(map) {
       <strong>CEMS RAPID MAPPING EMSR517 - AOI15</strong>
     </div>
     
+    <div class="legend-section-compact" style="margin-bottom: 12px; padding: 8px; background: #f9f9f9; border-radius: 4px;">
+      <label class="legend-item-compact" style="font-weight: bold;">
+        <input type="checkbox" id="masterToggle" style="width: 16px; height: 16px;">
+        <span class="layer-name">Alle Layer anzeigen</span>
+      </label>
+    </div>
+    
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="19_07">
         <span class="section-toggle-icon">▶</span>
@@ -299,8 +306,9 @@ function createCustomLayerControl(map) {
       <div class="legend-date-header" data-section="11_08">
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
-          <strong>11.08.2021 - Monitoring</strong>
-          <small>Ortssituation am 20/07/2021, 10:35 Uhr</small>
+          <strong>Ortssituation am 20/07/2021, 10:35 Uhr</strong>
+          <small>Aktivierung: 13/07/2021, 17:11</small>
+          <small>Kartierung: 11/08/2021</small>
         </div>
       </div>
       <div class="legend-date-content" data-section-content="11_08" style="display: none;">
@@ -472,6 +480,30 @@ function createCustomLayerControl(map) {
     });
   });
 
+  // Master Toggle für alle Layer
+  var masterToggle = controlDiv.querySelector('#masterToggle');
+  masterToggle.addEventListener('change', function() {
+    if (this.checked) {
+      // Alle Checkboxen aktivieren
+      controlDiv.querySelectorAll('.layer-toggle, .category-toggle').forEach(function(checkbox) {
+        if (!checkbox.checked) {
+          checkbox.checked = true;
+          // Trigger change event
+          checkbox.dispatchEvent(new Event('change'));
+        }
+      });
+    } else {
+      // Alle Checkboxen deaktivieren
+      controlDiv.querySelectorAll('.layer-toggle, .category-toggle').forEach(function(checkbox) {
+        if (checkbox.checked) {
+          checkbox.checked = false;
+          // Trigger change event
+          checkbox.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+  });
+
   var CustomControl = L.Control.extend({
     options: {
       position: 'topright'
@@ -482,7 +514,4 @@ function createCustomLayerControl(map) {
   });
 
   new CustomControl().addTo(map);
-  
-  // NICHT: Object.values(layerGroups).forEach(...addTo(map))
-  // Layer bleiben ausgeblendet bis der Nutzer sie aktiviert
 }
