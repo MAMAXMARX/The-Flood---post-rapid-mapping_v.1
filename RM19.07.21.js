@@ -14,14 +14,13 @@ var layerGroups_19_07 = {
 
 // Hauptfunktion zum Laden aller Rapid Mapping Daten vom 19.07.2021
 function loadRapidMappingData_19_07(map, allLayers) {
-  
-  // Area of Interest A (Untersuchungsgebiet)
+  // Untersuchungsgebiet (schwarz, kein Filling)
   loadGeoJSON(
     './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_areaOfInterestA_r1_v1.json',
     {
-      color: '#7e0909ff',
+      color: '#000000',
       fillOpacity: 0,
-      weight: 1
+      weight: 2
     },
     'Area of Interest A',
     'AOI - Untersuchungsgebiet',
@@ -30,8 +29,7 @@ function loadRapidMappingData_19_07(map, allLayers) {
     layerGroups_19_07.aoi
   );
 
-  // Observed Event A (Überschwemmungsgebiet)
-  // Wird automatisch nach "Flooded area" (dunkelblau) und "Flood trace" (türkis) unterschieden
+  // Überschwemmungsgebiet
   loadGeoJSON_19_07(
     './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_observedEventA_r1_v1.json',
     null,
@@ -39,21 +37,10 @@ function loadRapidMappingData_19_07(map, allLayers) {
     'Observed Event A',
     map,
     allLayers,
-    null // Wird automatisch aufgeteilt
+    null
   );
 
-  // Built Up Points (Gebäude mit Schadensgrad)
-  loadGeoJSON_19_07(
-    './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_builtUpP_r1_v1.json',
-    null,
-    'Gebäude',
-    'Residential Buildings',
-    map,
-    allLayers,
-    layerGroups_19_07.buildings
-  );
-
-  // Facilities (Infrastruktur und öffentliche Einrichtungen)
+  // Infrastruktur
   loadGeoJSON_19_07(
     './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_facilitiesA_r1_v1.json',
     null,
@@ -62,6 +49,17 @@ function loadRapidMappingData_19_07(map, allLayers) {
     map,
     allLayers,
     layerGroups_19_07.facilities
+  );
+
+  // Betroffene Gebäude
+  loadGeoJSON_19_07(
+    './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_builtUpP_r1_v1.json',
+    null,
+    'Gebäude',
+    'Residential Buildings',
+    map,
+    allLayers,
+    layerGroups_19_07.buildings
   );
 }
 
@@ -348,3 +346,40 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
   
   // Layer-Gruppen NICHT sofort hinzufügen - bleiben ausgeblendet
 }
+
+function showLayerGroupHierarchy_19_07(map) {
+  Object.values(layerGroups_19_07).forEach(function(group) {
+    map.removeLayer(group);
+  });
+  map.addLayer(layerGroups_19_07.aoi);
+  map.addLayer(layerGroups_19_07.floodedArea);
+  map.addLayer(layerGroups_19_07.floodTrace);
+  map.addLayer(layerGroups_19_07.facilities);
+  map.addLayer(layerGroups_19_07.buildings);
+}
+
+function addLayerWithHierarchy_19_07(map, groupName) {
+  Object.values(layerGroups_19_07).forEach(function(group) {
+    map.removeLayer(group);
+  });
+  if (map.hasLayer(layerGroups_19_07.aoi)) map.addLayer(layerGroups_19_07.aoi);
+  if (map.hasLayer(layerGroups_19_07.floodedArea)) map.addLayer(layerGroups_19_07.floodedArea);
+  if (map.hasLayer(layerGroups_19_07.floodTrace)) map.addLayer(layerGroups_19_07.floodTrace);
+  if (map.hasLayer(layerGroups_19_07.facilities)) map.addLayer(layerGroups_19_07.facilities);
+  if (map.hasLayer(layerGroups_19_07.buildings)) map.addLayer(layerGroups_19_07.buildings);
+}
+
+// Beispiel: Im Event-Listener für Checkboxen nach dem Hinzufügen/Entfernen:
+content_19_07.querySelectorAll('.layer-toggle[data-date="19_07"]').forEach(function(checkbox) {
+  checkbox.addEventListener('change', function() {
+    var layerName = this.getAttribute('data-layer').replace('_19_07', '');
+    if (this.checked) {
+      map.addLayer(layerGroups_19_07[layerName]);
+    } else {
+      map.removeLayer(layerGroups_19_07[layerName]);
+    }
+    addLayerWithHierarchy_19_07(map, layerName);
+  });
+});
+
+// Gleiches Prinzip für Kategorie-Toggles und Section-Toggles anwenden

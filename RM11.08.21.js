@@ -224,14 +224,13 @@ function updateMapView(map, allLayers) {
 
 // Hauptfunktion zum Laden aller Rapid Mapping Daten
 function loadRapidMappingData(map, allLayers) {
-  
-  // Area of Interest A (Untersuchungsgebiet)
+  // Untersuchungsgebiet (schwarz, kein Filling)
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_areaOfInterestA_r1_v3.json',
     {
-      color: '#7e0909ff',
+      color: '#000000',
       fillOpacity: 0,
-      weight: 1
+      weight: 2
     },
     'Area of Interest A',
     'AOI - Untersuchungsgebiet',
@@ -240,30 +239,18 @@ function loadRapidMappingData(map, allLayers) {
     layerGroups.aoi
   );
 
-  // Observed Event A (Überschwemmungsgebiet)
-  // Wird automatisch nach "Flooded area" (dunkelblau) und "Flood trace" (türkis) unterschieden
+  // Überschwemmungsgebiet
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_observedEventA_r1_v3.json',
-    null, // Stil wird automatisch durch getFloodStyle() gesetzt
+    null,
     'Überschwemmungsgebiet',
     'Observed Event A',
     map,
     allLayers,
-    null // Wird automatisch aufgeteilt in floodedArea und floodTrace
+    null
   );
 
-  // Built Up Points (Gebäude mit Schadensgrad)
-  loadGeoJSON(
-    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_builtUpP_r1_v3.json',
-    null,
-    'Gebäude',
-    'Residential Buildings',
-    map,
-    allLayers,
-    layerGroups.buildings
-  );
-
-  // Facilities (Infrastruktur und öffentliche Einrichtungen)
+  // Infrastruktur
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_facilitiesA_r1_v3.json',
     null,
@@ -272,6 +259,17 @@ function loadRapidMappingData(map, allLayers) {
     map,
     allLayers,
     layerGroups.facilities
+  );
+
+  // Betroffene Gebäude
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_builtUpP_r1_v3.json',
+    null,
+    'Gebäude',
+    'Residential Buildings',
+    map,
+    allLayers,
+    layerGroups.buildings
   );
 }
 
@@ -548,3 +546,46 @@ function createCustomLayerControl(map) {
 
   new CustomControl().addTo(map);
 }
+
+// Beim Anzeigen der Layer-Gruppen Reihenfolge beachten (Untersuchungsgebiet ganz unten)
+function showLayerGroupHierarchy(map) {
+  // Entferne alle Layer-Gruppen zuerst
+  Object.values(layerGroups).forEach(function(group) {
+    map.removeLayer(group);
+  });
+  // Füge in gewünschter Reihenfolge hinzu
+  map.addLayer(layerGroups.aoi);
+  map.addLayer(layerGroups.floodedArea);
+  map.addLayer(layerGroups.floodTrace);
+  map.addLayer(layerGroups.facilities);
+  map.addLayer(layerGroups.buildings);
+}
+
+// Passe alle Stellen an, wo Layer hinzugefügt werden (z.B. nach Checkbox-Änderung)
+function addLayerWithHierarchy(map, groupName) {
+  // Entferne alle Layer-Gruppen
+  Object.values(layerGroups).forEach(function(group) {
+    map.removeLayer(group);
+  });
+  // Füge in richtiger Reihenfolge hinzu, aber nur die aktivierten Gruppen
+  if (map.hasLayer(layerGroups.aoi)) map.addLayer(layerGroups.aoi);
+  if (map.hasLayer(layerGroups.floodedArea)) map.addLayer(layerGroups.floodedArea);
+  if (map.hasLayer(layerGroups.floodTrace)) map.addLayer(layerGroups.floodTrace);
+  if (map.hasLayer(layerGroups.facilities)) map.addLayer(layerGroups.facilities);
+  if (map.hasLayer(layerGroups.buildings)) map.addLayer(layerGroups.buildings);
+}
+
+// Beispiel: Im Event-Listener für Checkboxen nach dem Hinzufügen/Entfernen:
+controlDiv.querySelectorAll('.layer-toggle[data-date="11_08"]').forEach(function(checkbox) {
+  checkbox.addEventListener('change', function() {
+    var layerName = this.getAttribute('data-layer');
+    if (this.checked) {
+      map.addLayer(layerGroups[layerName]);
+    } else {
+      map.removeLayer(layerGroups[layerName]);
+    }
+    addLayerWithHierarchy(map, layerName);
+  });
+});
+
+// Gleiches Prinzip für Kategorie-Toggles und Section-Toggles anwenden
