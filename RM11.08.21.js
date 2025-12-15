@@ -482,8 +482,6 @@ function createCustomLayerControl(map) {
 
   new CustomControl().addTo(map);
   
-  // Alle Layer-Gruppen initial zur Karte hinzufügen
-  Object.values(layerGroups).forEach(function(group) {
-    map.addLayer(group);
-  });
+  // NICHT: Object.values(layerGroups).forEach(...addTo(map))
+  // Layer bleiben ausgeblendet bis der Nutzer sie aktiviert
 }

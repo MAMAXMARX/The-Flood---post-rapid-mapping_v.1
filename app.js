@@ -55,12 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
     "CartoDB Voyager": cartoVoyager
   };
 
-  // Standard Layer Control für Basiskarten hinzufügen (unten links)
-  L.control.layers(baseMaps, {}, {
-    position: 'bottomleft',
-    collapsed: false
-  }).addTo(map);
-
   // ============================================
   // RAPID MAPPING DATEN LADEN
   // ============================================

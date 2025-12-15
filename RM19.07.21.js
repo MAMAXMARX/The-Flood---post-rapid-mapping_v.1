@@ -344,8 +344,5 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
     });
   });
   
-  // Alle Layer-Gruppen initial zur Karte hinzufügen
-  Object.values(layerGroups_19_07).forEach(function(group) {
-    map.addLayer(group);
-  });
+  // Layer-Gruppen NICHT sofort hinzufügen - bleiben ausgeblendet
 }
