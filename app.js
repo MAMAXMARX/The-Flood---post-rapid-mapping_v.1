@@ -55,15 +55,9 @@ document.addEventListener('DOMContentLoaded', function () {
     "CartoDB Voyager": cartoVoyager
   };
 
-  // ============================================
-  // OVERLAY LAYERS (Ein-/Ausblendbare Ebenen)
-  // ============================================
-  
-  var overlayMaps = {};
-
-  // Standard Layer Control für Basiskarten hinzufügen (oben rechts)
-  L.control.layers(baseMaps, overlayMaps, {
-    position: 'topright',
+  // Standard Layer Control für Basiskarten hinzufügen (unten links)
+  L.control.layers(baseMaps, {}, {
+    position: 'bottomleft',
     collapsed: false
   }).addTo(map);
 
