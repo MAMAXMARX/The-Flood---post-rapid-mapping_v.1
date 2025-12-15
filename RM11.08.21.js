@@ -305,7 +305,6 @@ function createCustomLayerControl(map) {
         <input type="checkbox" class="section-layer-toggle" data-section="11_08" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
       </div>
       <div class="legend-date-content" data-section-content="11_08" style="display: none;">
-        
         <div class="legend-section-compact">
           <label class="legend-item-compact">
             <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
@@ -313,59 +312,62 @@ function createCustomLayerControl(map) {
             <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
           </label>
         </div>
-        
         <div class="legend-section-compact">
           <div class="legend-category-compact">
             <span class="toggle-icon-small">▼</span>
-            <label>
+            <label style="flex:1;">
               <input type="checkbox" class="category-toggle" data-category="buildings" data-date="11_08" checked>
               <strong>Betroffene Gebäude</strong>
             </label>
           </div>
           <div class="legend-subcategory-compact" data-category="buildings">
             <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="buildings" data-date="11_08" checked>
               <span class="layer-name">Mögl. beschädigt</span>
               <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
             </label>
             <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="buildings" data-date="11_08" checked>
               <span class="layer-name">Beschädigt</span>
               <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
             </label>
             <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="buildings" data-date="11_08" checked>
               <span class="layer-name">Zerstört</span>
               <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
             </label>
           </div>
         </div>
-        
         <div class="legend-section-compact">
           <div class="legend-category-compact">
             <span class="toggle-icon-small">▼</span>
-            <label>
+            <label style="flex:1;">
               <input type="checkbox" class="category-toggle" data-category="facilities" data-date="11_08" checked>
               <strong>Infrastruktur</strong>
             </label>
           </div>
           <div class="legend-subcategory-compact" data-category="facilities">
             <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Mögl. beschädigt</span>
               <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
             </label>
             <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Beschädigt</span>
               <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
             </label>
             <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Zerstört</span>
               <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
             </label>
           </div>
         </div>
-        
         <div class="legend-section-compact">
           <div class="legend-category-compact">
             <span class="toggle-icon-small">▼</span>
-            <label>
+            <label style="flex:1;">
               <input type="checkbox" class="category-toggle" data-category="flood" data-date="11_08" checked>
               <strong>Überschwemmung</strong>
             </label>
@@ -432,10 +434,33 @@ function createCustomLayerControl(map) {
     });
   });
 
-  // Toggle Icons für Ein-/Ausklappen der Kategorien (11.08)
+  // Subtype-Toggles für Gebäudeschäden/Infrastruktur
+  controlDiv.querySelectorAll('.subtype-toggle[data-date="11_08"]').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function(e) {
+      var type = this.getAttribute('data-type');
+      var group = this.getAttribute('data-group');
+      var checked = this.checked;
+      // Filtere alle Marker/Polygone im jeweiligen LayerGroup nach Schadensgrad
+      layerGroups[group].eachLayer(function(layer) {
+        if (
+          layer.feature &&
+          layer.feature.properties &&
+          layer.feature.properties.damage_gra === type
+        ) {
+          if (checked) {
+            if (!map.hasLayer(layer)) map.addLayer(layer);
+          } else {
+            if (map.hasLayer(layer)) map.removeLayer(layer);
+          }
+        }
+      });
+      e.stopPropagation();
+    });
+  });
+
+  // Toggle Icons für Ein-/Ausklappen der Kategorien (nur bei Klick auf Icon/Titel)
   controlDiv.querySelectorAll('.legend-category-compact').forEach(function(category) {
     category.addEventListener('click', function(e) {
-      // Nur ausklappen, wenn NICHT auf die Checkbox geklickt wurde
       if (
         e.target.classList.contains('toggle-icon-small') ||
         e.target.tagName === 'STRONG'
@@ -475,7 +500,7 @@ function createCustomLayerControl(map) {
   controlDiv.querySelectorAll('.section-layer-toggle').forEach(function(toggle) {
     toggle.addEventListener('change', function() {
       var section = this.getAttribute('data-section');
-      var content = controlDiv.querySelector(`[data-section-content="${section}"]`);
+      var content = controlDiv.querySelector(`[data-section_content="${section}"]`);
       if (!content) return;
       // Alle Layer- und Kategorie-Checkboxen dieser Sektion
       var checkboxes = content.querySelectorAll('.layer-toggle, .category-toggle');
