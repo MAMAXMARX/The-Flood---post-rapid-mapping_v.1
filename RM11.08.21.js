@@ -284,14 +284,25 @@ function createCustomLayerControl(map) {
     </div>
     
     <div class="legend-date-section">
+      <div class="legend-date-header" data-section="19_07">
+        <span class="section-toggle-icon">▶</span>
+        <div class="date-header-content">
+          <strong>19.07.2021 - Erstaufnahme</strong>
+          <small>Erste Rapid Mapping Daten</small>
+        </div>
+      </div>
+      <div class="legend-date-content" data-section-content="19_07" style="display: none;"></div>
+    </div>
+    
+    <div class="legend-date-section">
       <div class="legend-date-header" data-section="11_08">
-        <span class="section-toggle-icon">▼</span>
+        <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
           <strong>11.08.2021 - Monitoring</strong>
           <small>Ortssituation am 20/07/2021, 10:35 Uhr</small>
         </div>
       </div>
-      <div class="legend-date-content" data-section-content="11_08">
+      <div class="legend-date-content" data-section-content="11_08" style="display: none;">
         
         <div class="legend-section-compact">
           <label class="legend-item-compact">
@@ -380,17 +391,6 @@ function createCustomLayerControl(map) {
         </div>
         
       </div>
-    </div>
-    
-    <div class="legend-date-section">
-      <div class="legend-date-header" data-section="19_07">
-        <span class="section-toggle-icon">▼</span>
-        <div class="date-header-content">
-          <strong>19.07.2021 - Erstaufnahme</strong>
-          <small>Erste Rapid Mapping Daten</small>
-        </div>
-      </div>
-      <div class="legend-date-content" data-section-content="19_07"></div>
     </div>
   `;
 
