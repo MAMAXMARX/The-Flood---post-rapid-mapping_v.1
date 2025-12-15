@@ -203,7 +203,7 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
   content_19_07.innerHTML = `
     <div class="legend-section-compact">
       <label class="legend-item-compact">
-        <input type="checkbox" class="layer-toggle" data-layer="aoi_19_07" data-date="19_07" checked>
+        <input type="checkbox" class="layer-toggle" data-layer="aoi_19_07" data-date="19_07">
         <span class="layer-name">Untersuchungsgebiet</span>
         <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
       </label>
@@ -212,20 +212,23 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
         <label>
-          <input type="checkbox" class="category-toggle" data-category="buildings_19_07" data-date="19_07" checked>
+          <input type="checkbox" class="category-toggle" data-category="buildings_19_07" data-date="19_07">
           <strong>Betroffene Gebäude</strong>
         </label>
       </div>
       <div class="legend-subcategory-compact" data-category="buildings">
         <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="buildings" data-date="19_07">
           <span class="layer-name">Mögl. beschädigt</span>
           <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
         </label>
         <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="buildings" data-date="19_07">
           <span class="layer-name">Beschädigt</span>
           <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
         </label>
         <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="buildings" data-date="19_07">
           <span class="layer-name">Zerstört</span>
           <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
         </label>
@@ -235,20 +238,23 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
         <label>
-          <input type="checkbox" class="category-toggle" data-category="facilities_19_07" data-date="19_07" checked>
+          <input type="checkbox" class="category-toggle" data-category="facilities_19_07" data-date="19_07">
           <strong>Infrastruktur</strong>
         </label>
       </div>
       <div class="legend-subcategory-compact" data-category="facilities">
         <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="facilities" data-date="19_07">
           <span class="layer-name">Mögl. beschädigt</span>
           <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
         </label>
         <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="facilities" data-date="19_07">
           <span class="layer-name">Beschädigt</span>
           <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
         </label>
         <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="facilities" data-date="19_07">
           <span class="layer-name">Zerstört</span>
           <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
         </label>
@@ -258,18 +264,18 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
         <label>
-          <input type="checkbox" class="category-toggle" data-category="flood_19_07" data-date="19_07" checked>
+          <input type="checkbox" class="category-toggle" data-category="flood_19_07" data-date="19_07">
           <strong>Überschwemmung</strong>
         </label>
       </div>
       <div class="legend-subcategory-compact" data-category="flood">
         <label class="legend-item-compact">
-          <input type="checkbox" class="layer-toggle" data-layer="floodedArea_19_07" data-date="19_07" checked>
+          <input type="checkbox" class="layer-toggle" data-layer="floodedArea_19_07" data-date="19_07">
           <span class="layer-name">Flooded Area</span>
           <span class="legend-symbol-small" style="background: #3399ff; border: 2px solid #0066cc;"></span>
         </label>
         <label class="legend-item-compact">
-          <input type="checkbox" class="layer-toggle" data-layer="floodTrace_19_07" data-date="19_07" checked>
+          <input type="checkbox" class="layer-toggle" data-layer="floodTrace_19_07" data-date="19_07">
           <span class="layer-name">Flood Trace</span>
           <span class="legend-symbol-small" style="background: #00cccc; border: 1px solid #006666;"></span>
         </label>

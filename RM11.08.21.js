@@ -389,6 +389,44 @@ function createCustomLayerControl(map) {
     </div>
   `;
 
+  // Alle Layer- und Kategorie-Checkboxen beim Laden deaktivieren
+  setTimeout(function() {
+    controlDiv.querySelectorAll('.layer-toggle, .category-toggle, .subtype-toggle').forEach(function(cb) {
+      cb.checked = false;
+    });
+    controlDiv.querySelectorAll('.section-layer-toggle').forEach(function(cb) {
+      cb.checked = false;
+    });
+  }, 0);
+
+  // Event Listener für Section-Layer-Toggles (je Mapping)
+  controlDiv.querySelectorAll('.section-layer-toggle').forEach(function(toggle) {
+    toggle.addEventListener('change', function(e) {
+      var section = this.getAttribute('data-section');
+      var content = controlDiv.querySelector(`[data-section-content="${section}"]`);
+      if (!content) return;
+      // Alle Layer- und Kategorie-Checkboxen dieser Sektion
+      var checkboxes = content.querySelectorAll('.layer-toggle, .category-toggle, .subtype-toggle');
+      if (this.checked) {
+        checkboxes.forEach(function(cb) {
+          if (!cb.checked) {
+            cb.checked = true;
+            cb.dispatchEvent(new Event('change'));
+          }
+        });
+      } else {
+        checkboxes.forEach(function(cb) {
+          if (cb.checked) {
+            cb.checked = false;
+            cb.dispatchEvent(new Event('change'));
+          }
+        });
+      }
+      // NICHT automatisch ausklappen!
+      e.stopPropagation();
+    });
+  });
+
   // Event Listeners für Layer-Toggles (11.08)
   controlDiv.querySelectorAll('.layer-toggle[data-date="11_08"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
@@ -461,18 +499,21 @@ function createCustomLayerControl(map) {
   // Toggle Icons für Ein-/Ausklappen der Kategorien (nur bei Klick auf Icon/Titel)
   controlDiv.querySelectorAll('.legend-category-compact').forEach(function(category) {
     category.addEventListener('click', function(e) {
+      // Nur aufklappen, wenn auf das Icon oder den Titel (STRONG) geklickt wird
       if (
         e.target.classList.contains('toggle-icon-small') ||
         e.target.tagName === 'STRONG'
       ) {
         var icon = this.querySelector('.toggle-icon-small');
         var subcategory = this.parentElement.querySelector('.legend-subcategory-compact');
-        if (subcategory.style.display === 'none') {
-          subcategory.style.display = 'block';
-          icon.textContent = '▼';
-        } else {
-          subcategory.style.display = 'none';
-          icon.textContent = '▶';
+        if (subcategory) {
+          if (subcategory.style.display === 'none' || subcategory.style.display === '') {
+            subcategory.style.display = 'block';
+            icon.textContent = '▼';
+          } else {
+            subcategory.style.display = 'none';
+            icon.textContent = '▶';
+          }
         }
       }
     });
@@ -493,33 +534,6 @@ function createCustomLayerControl(map) {
         content.style.display = 'none';
         icon.textContent = '▶';
       }
-    });
-  });
-
-  // Event Listener für Section-Layer-Toggles (je Mapping)
-  controlDiv.querySelectorAll('.section-layer-toggle').forEach(function(toggle) {
-    toggle.addEventListener('change', function() {
-      var section = this.getAttribute('data-section');
-      var content = controlDiv.querySelector(`[data-section_content="${section}"]`);
-      if (!content) return;
-      // Alle Layer- und Kategorie-Checkboxen dieser Sektion
-      var checkboxes = content.querySelectorAll('.layer-toggle, .category-toggle');
-      if (this.checked) {
-        checkboxes.forEach(function(cb) {
-          if (!cb.checked) {
-            cb.checked = true;
-            cb.dispatchEvent(new Event('change'));
-          }
-        });
-      } else {
-        checkboxes.forEach(function(cb) {
-          if (cb.checked) {
-            cb.checked = false;
-            cb.dispatchEvent(new Event('change'));
-          }
-        });
-      }
-      // NICHT automatisch ausklappen!
     });
   });
 
