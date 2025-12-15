@@ -280,7 +280,7 @@ function createCustomLayerControl(map) {
   var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
   controlDiv.innerHTML = `
     <div class="legend-main-header">
-      <strong>CEMS RAPID MAPPING EMSR517 - AOI15</strong>
+      <strong>CEMS RAPID MAPPING EMSR517 - AOI15 Einschätzung der Flutkatastrophe im Ahrtal</strong>
     </div>
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="19_07">
@@ -383,15 +383,6 @@ function createCustomLayerControl(map) {
             </label>
           </div>
         </div>
-        
-        <div class="legend-info-compact">
-          <small>
-            Event: 13/07/2021 16:00<br>
-            Activation: 13/07/2021 17:11<br>
-            Map production: 11/08/2021
-          </small>
-        </div>
-        
       </div>
     </div>
   `;
@@ -410,7 +401,7 @@ function createCustomLayerControl(map) {
 
   // Event Listeners für Kategorie-Toggles (11.08)
   controlDiv.querySelectorAll('.category-toggle[data-date="11_08"]').forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener('change', function(e) {
       var category = this.getAttribute('data-category');
       if (category === 'buildings') {
         if (this.checked) {
@@ -429,20 +420,26 @@ function createCustomLayerControl(map) {
         subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
           if (this.checked) {
             subCheckbox.checked = true;
-            map.addLayer(layerGroups[subCheckbox.getAttribute('data-layer')]);
+            subCheckbox.dispatchEvent(new Event('change'));
           } else {
             subCheckbox.checked = false;
-            map.removeLayer(layerGroups[subCheckbox.getAttribute('data-layer')]);
+            subCheckbox.dispatchEvent(new Event('change'));
           }
         }.bind(this));
       }
+      // Verhindere, dass das Ausklappen beim Klick auf die Checkbox getriggert wird
+      e.stopPropagation();
     });
   });
 
   // Toggle Icons für Ein-/Ausklappen der Kategorien (11.08)
   controlDiv.querySelectorAll('.legend-category-compact').forEach(function(category) {
     category.addEventListener('click', function(e) {
-      if (e.target.classList.contains('toggle-icon-small') || e.target.tagName === 'STRONG') {
+      // Nur ausklappen, wenn NICHT auf die Checkbox geklickt wurde
+      if (
+        e.target.classList.contains('toggle-icon-small') ||
+        e.target.tagName === 'STRONG'
+      ) {
         var icon = this.querySelector('.toggle-icon-small');
         var subcategory = this.parentElement.querySelector('.legend-subcategory-compact');
         if (subcategory.style.display === 'none') {
@@ -455,14 +452,15 @@ function createCustomLayerControl(map) {
       }
     });
   });
-  
+
   // Event Listeners für Datums-Header (Auf-/Zuklappen der ganzen Abschnitte)
   controlDiv.querySelectorAll('.legend-date-header').forEach(function(header) {
-    header.addEventListener('click', function() {
+    header.addEventListener('click', function(e) {
+      // Nicht ausklappen, wenn auf die Section-Layer-Toggle-Checkbox geklickt wurde
+      if (e.target.classList.contains('section-layer-toggle')) return;
       var section = this.getAttribute('data-section');
       var content = controlDiv.querySelector(`[data-section-content="${section}"]`);
       var icon = this.querySelector('.section-toggle-icon');
-      
       if (content.style.display === 'none') {
         content.style.display = 'block';
         icon.textContent = '▼';
@@ -496,6 +494,7 @@ function createCustomLayerControl(map) {
           }
         });
       }
+      // NICHT automatisch ausklappen!
     });
   });
 

@@ -275,12 +275,6 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         </label>
       </div>
     </div>
-    <div class="legend-info-compact">
-      <small>
-        Event: 13/07/2021 16:00<br>
-        Aktivierung: 13/07/2021, 17:11<br>
-        Kartierung: 19/07/2021
-      </small>
     </div>
   `;
   
