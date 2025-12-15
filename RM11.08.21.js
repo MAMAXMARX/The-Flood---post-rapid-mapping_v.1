@@ -62,15 +62,15 @@ function getDamageColor(damageGrade) {
 function getFloodStyle(notation) {
   if (notation === 'Flooded area') {
     return {
-      color: '#0066cc',
-      fillColor: '#3399ff',
+      color: '#1b00ccff',
+      fillColor: '#056bd2ff',
       fillOpacity: 0.5,
       weight: 2
     };
   } else if (notation === 'Flood trace') {
     return {
-      color: '#006666',
-      fillColor: '#00cccc',
+      color: '#03484eff',
+      fillColor: '#00dddd71',
       fillOpacity: 0.3,
       weight: 1
     };
