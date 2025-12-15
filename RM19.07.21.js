@@ -199,9 +199,7 @@ function loadGeoJSON_19_07(url, style, layerName, description, map, allLayers, t
 
 // Layer Control für 19.07 Daten erweitern
 function addLayerControl_19_07_ToExisting(controlDiv, map) {
-  
   var content_19_07 = controlDiv.querySelector('[data-section-content="19_07"]');
-  
   content_19_07.innerHTML = `
     <div class="legend-section-compact">
       <label class="legend-item-compact">
@@ -210,7 +208,6 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
       </label>
     </div>
-    
     <div class="legend-section-compact">
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
@@ -234,7 +231,6 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         </label>
       </div>
     </div>
-    
     <div class="legend-section-compact">
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
@@ -258,7 +254,6 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         </label>
       </div>
     </div>
-    
     <div class="legend-section-compact">
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
@@ -280,12 +275,11 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         </label>
       </div>
     </div>
-    
     <div class="legend-info-compact">
       <small>
         Event: 13/07/2021 16:00<br>
-        Activation: 13/07/2021 17:11<br>
-        Map production: 19/07/2021
+        Aktivierung: 13/07/2021, 17:11<br>
+        Kartierung: 19/07/2021
       </small>
     </div>
   `;
