@@ -282,20 +282,15 @@ function createCustomLayerControl(map) {
     <div class="legend-main-header">
       <strong>CEMS RAPID MAPPING EMSR517 - AOI15</strong>
     </div>
-    <div class="legend-section-compact" style="margin-bottom: 12px; padding: 8px; background: #f9f9f9; border-radius: 4px;">
-      <label class="legend-item-compact" style="font-weight: bold;">
-        <input type="checkbox" id="masterToggle" style="width: 16px; height: 16px;">
-        <span class="layer-name">Alle Layer anzeigen</span>
-      </label>
-    </div>
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="19_07">
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
           <strong>Ortssituation am 18/07/2021, 10:50 Uhr</strong>
-          <small>Aktivierung: 13/07/2021, 17:11</small>
-          <small>Kartierung: 19/07/2021</small>
+          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
+          <small style="display:block;">Kartierung: 19/07/2021</small>
         </div>
+        <input type="checkbox" class="section-layer-toggle" data-section="19_07" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
       </div>
       <div class="legend-date-content" data-section-content="19_07" style="display: none;"></div>
     </div>
@@ -304,9 +299,10 @@ function createCustomLayerControl(map) {
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
           <strong>Ortssituation am 20/07/2021, 10:35 Uhr</strong>
-          <small>Aktivierung: 13/07/2021, 17:11</small>
-          <small>Kartierung: 11/08/2021</small>
+          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
+          <small style="display:block;">Kartierung: 11/08/2021</small>
         </div>
+        <input type="checkbox" class="section-layer-toggle" data-section="11_08" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
       </div>
       <div class="legend-date-content" data-section-content="11_08" style="display: none;">
         
@@ -477,28 +473,30 @@ function createCustomLayerControl(map) {
     });
   });
 
-  // Master Toggle für alle Layer
-  var masterToggle = controlDiv.querySelector('#masterToggle');
-  masterToggle.addEventListener('change', function() {
-    if (this.checked) {
-      // Alle Checkboxen aktivieren
-      controlDiv.querySelectorAll('.layer-toggle, .category-toggle').forEach(function(checkbox) {
-        if (!checkbox.checked) {
-          checkbox.checked = true;
-          // Trigger change event
-          checkbox.dispatchEvent(new Event('change'));
-        }
-      });
-    } else {
-      // Alle Checkboxen deaktivieren
-      controlDiv.querySelectorAll('.layer-toggle, .category-toggle').forEach(function(checkbox) {
-        if (checkbox.checked) {
-          checkbox.checked = false;
-          // Trigger change event
-          checkbox.dispatchEvent(new Event('change'));
-        }
-      });
-    }
+  // Event Listener für Section-Layer-Toggles (je Mapping)
+  controlDiv.querySelectorAll('.section-layer-toggle').forEach(function(toggle) {
+    toggle.addEventListener('change', function() {
+      var section = this.getAttribute('data-section');
+      var content = controlDiv.querySelector(`[data-section-content="${section}"]`);
+      if (!content) return;
+      // Alle Layer- und Kategorie-Checkboxen dieser Sektion
+      var checkboxes = content.querySelectorAll('.layer-toggle, .category-toggle');
+      if (this.checked) {
+        checkboxes.forEach(function(cb) {
+          if (!cb.checked) {
+            cb.checked = true;
+            cb.dispatchEvent(new Event('change'));
+          }
+        });
+      } else {
+        checkboxes.forEach(function(cb) {
+          if (cb.checked) {
+            cb.checked = false;
+            cb.dispatchEvent(new Event('change'));
+          }
+        });
+      }
+    });
   });
 
   var CustomControl = L.Control.extend({
