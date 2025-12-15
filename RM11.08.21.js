@@ -279,99 +279,123 @@ function loadRapidMappingData(map, allLayers) {
 function createCustomLayerControl(map) {
   var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
   controlDiv.innerHTML = `
-    <div class="legend-header">
-      <strong>Rapid Mapping</strong>
-      <div class="legend-subtitle">Ortssituation am 20/07/2021, 10:35 Uhr</div>
-      <div class="legend-info">
-        <small>
-          Event: 13/07/2021 16:00<br>
-          Activation: 13/07/2021 17:11<br>
-          Map production: 11/08/2021
-        </small>
+    <div class="legend-main-header">
+      <strong>Rapid Mapping EMSR517</strong>
+    </div>
+    
+    <div class="legend-date-section">
+      <div class="legend-date-header" data-section="11_08">
+        <span class="section-toggle-icon">▼</span>
+        <div class="date-header-content">
+          <strong>11.08.2021 - Monitoring</strong>
+          <small>Ortssituation am 20/07/2021, 10:35 Uhr</small>
+        </div>
+      </div>
+      <div class="legend-date-content" data-section-content="11_08">
+        
+        <div class="legend-section-compact">
+          <label class="legend-item-compact">
+            <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
+            <span class="layer-name">Untersuchungsgebiet</span>
+            <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
+          </label>
+        </div>
+        
+        <div class="legend-section-compact">
+          <div class="legend-category-compact">
+            <span class="toggle-icon-small">▼</span>
+            <label>
+              <input type="checkbox" class="category-toggle" data-category="buildings" data-date="11_08" checked>
+              <strong>Betroffene Gebäude</strong>
+            </label>
+          </div>
+          <div class="legend-subcategory-compact" data-category="buildings">
+            <label class="legend-item-compact">
+              <span class="layer-name">Mögl. beschädigt</span>
+              <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <span class="layer-name">Beschädigt</span>
+              <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <span class="layer-name">Zerstört</span>
+              <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="legend-section-compact">
+          <div class="legend-category-compact">
+            <span class="toggle-icon-small">▼</span>
+            <label>
+              <input type="checkbox" class="category-toggle" data-category="facilities" data-date="11_08" checked>
+              <strong>Infrastruktur</strong>
+            </label>
+          </div>
+          <div class="legend-subcategory-compact" data-category="facilities">
+            <label class="legend-item-compact">
+              <span class="layer-name">Mögl. beschädigt</span>
+              <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <span class="layer-name">Beschädigt</span>
+              <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <span class="layer-name">Zerstört</span>
+              <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="legend-section-compact">
+          <div class="legend-category-compact">
+            <span class="toggle-icon-small">▼</span>
+            <label>
+              <input type="checkbox" class="category-toggle" data-category="flood" data-date="11_08" checked>
+              <strong>Überschwemmung</strong>
+            </label>
+          </div>
+          <div class="legend-subcategory-compact" data-category="flood">
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="floodedArea" data-date="11_08" checked>
+              <span class="layer-name">Flooded Area</span>
+              <span class="legend-symbol-small" style="background: #3399ff; border: 2px solid #0066cc;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="floodTrace" data-date="11_08" checked>
+              <span class="layer-name">Flood Trace</span>
+              <span class="legend-symbol-small" style="background: #00cccc; border: 1px solid #006666;"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="legend-info-compact">
+          <small>
+            Event: 13/07/2021 16:00<br>
+            Activation: 13/07/2021 17:11<br>
+            Map production: 11/08/2021
+          </small>
+        </div>
+        
       </div>
     </div>
     
-    <div class="legend-section">
-      <label class="legend-item">
-        <input type="checkbox" class="layer-toggle" data-layer="aoi" checked>
-        <span class="layer-name">Untersuchungsgebiet</span>
-        <span class="legend-symbol" style="border: 2px solid #7e0909ff; background: transparent;"></span>
-      </label>
-    </div>
-    
-    <div class="legend-section">
-      <div class="legend-category">
-        <span class="toggle-icon">▼</span>
-        <label>
-          <input type="checkbox" class="category-toggle" data-category="buildings" checked>
-          <strong>Betroffene Gebäude</strong>
-        </label>
+    <div class="legend-date-section">
+      <div class="legend-date-header" data-section="19_07">
+        <span class="section-toggle-icon">▼</span>
+        <div class="date-header-content">
+          <strong>19.07.2021 - Erstaufnahme</strong>
+          <small>Erste Rapid Mapping Daten</small>
+        </div>
       </div>
-      <div class="legend-subcategory" data-category="buildings">
-        <label class="legend-item">
-          <span class="layer-name">Möglicherweise beschädigt</span>
-          <span class="legend-symbol" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
-        </label>
-        <label class="legend-item">
-          <span class="layer-name">Beschädigt</span>
-          <span class="legend-symbol" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
-        </label>
-        <label class="legend-item">
-          <span class="layer-name">Zerstört</span>
-          <span class="legend-symbol" style="background: #3d070758; border: 1px solid #3d0707;"></span>
-        </label>
-      </div>
-    </div>
-    
-    <div class="legend-section">
-      <div class="legend-category">
-        <span class="toggle-icon">▼</span>
-        <label>
-          <input type="checkbox" class="category-toggle" data-category="facilities" checked>
-          <strong>Infrastruktur & Einrichtungen</strong>
-        </label>
-      </div>
-      <div class="legend-subcategory" data-category="facilities">
-        <label class="legend-item">
-          <span class="layer-name">Möglicherweise beschädigt</span>
-          <span class="legend-symbol" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
-        </label>
-        <label class="legend-item">
-          <span class="layer-name">Beschädigt</span>
-          <span class="legend-symbol" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
-        </label>
-        <label class="legend-item">
-          <span class="layer-name">Zerstört</span>
-          <span class="legend-symbol" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
-        </label>
-      </div>
-    </div>
-    
-    <div class="legend-section">
-      <div class="legend-category">
-        <span class="toggle-icon">▼</span>
-        <label>
-          <input type="checkbox" class="category-toggle" data-category="flood" checked>
-          <strong>Überschwemmungsgebiet</strong>
-        </label>
-      </div>
-      <div class="legend-subcategory" data-category="flood">
-        <label class="legend-item">
-          <input type="checkbox" class="layer-toggle" data-layer="floodedArea" checked>
-          <span class="layer-name">Überflutetes Gebiet</span>
-          <span class="legend-symbol" style="background: #3399ff; border: 2px solid #0066cc;"></span>
-        </label>
-        <label class="legend-item">
-          <input type="checkbox" class="layer-toggle" data-layer="floodTrace" checked>
-          <span class="layer-name">Überschwemmungs-Spur</span>
-          <span class="legend-symbol" style="background: #00cccc; border: 1px solid #006666;"></span>
-        </label>
-      </div>
+      <div class="legend-date-content" data-section-content="19_07"></div>
     </div>
   `;
 
-  // Event Listeners für Layer-Toggles
-  controlDiv.querySelectorAll('.layer-toggle').forEach(function(checkbox) {
+  // Event Listeners für Layer-Toggles (11.08)
+  controlDiv.querySelectorAll('.layer-toggle[data-date="11_08"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
       var layerName = this.getAttribute('data-layer');
       if (this.checked) {
@@ -382,8 +406,8 @@ function createCustomLayerControl(map) {
     });
   });
 
-  // Event Listeners für Kategorie-Toggles
-  controlDiv.querySelectorAll('.category-toggle').forEach(function(checkbox) {
+  // Event Listeners für Kategorie-Toggles (11.08)
+  controlDiv.querySelectorAll('.category-toggle[data-date="11_08"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
       var category = this.getAttribute('data-category');
       if (category === 'buildings') {
@@ -399,7 +423,7 @@ function createCustomLayerControl(map) {
           map.removeLayer(layerGroups.facilities);
         }
       } else if (category === 'flood') {
-        var subcategory = this.closest('.legend-section').querySelector('.legend-subcategory');
+        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
           if (this.checked) {
             subCheckbox.checked = true;
@@ -413,12 +437,12 @@ function createCustomLayerControl(map) {
     });
   });
 
-  // Toggle Icons für Ein-/Ausklappen
-  controlDiv.querySelectorAll('.legend-category').forEach(function(category) {
+  // Toggle Icons für Ein-/Ausklappen der Kategorien (11.08)
+  controlDiv.querySelectorAll('.legend-category-compact').forEach(function(category) {
     category.addEventListener('click', function(e) {
-      if (e.target.classList.contains('toggle-icon') || e.target.tagName === 'STRONG') {
-        var icon = this.querySelector('.toggle-icon');
-        var subcategory = this.parentElement.querySelector('.legend-subcategory');
+      if (e.target.classList.contains('toggle-icon-small') || e.target.tagName === 'STRONG') {
+        var icon = this.querySelector('.toggle-icon-small');
+        var subcategory = this.parentElement.querySelector('.legend-subcategory-compact');
         if (subcategory.style.display === 'none') {
           subcategory.style.display = 'block';
           icon.textContent = '▼';
@@ -426,6 +450,23 @@ function createCustomLayerControl(map) {
           subcategory.style.display = 'none';
           icon.textContent = '▶';
         }
+      }
+    });
+  });
+  
+  // Event Listeners für Datums-Header (Auf-/Zuklappen der ganzen Abschnitte)
+  controlDiv.querySelectorAll('.legend-date-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      var section = this.getAttribute('data-section');
+      var content = controlDiv.querySelector(`[data-section-content="${section}"]`);
+      var icon = this.querySelector('.section-toggle-icon');
+      
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.textContent = '▼';
+      } else {
+        content.style.display = 'none';
+        icon.textContent = '▶';
       }
     });
   });
