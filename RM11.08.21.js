@@ -228,9 +228,9 @@ function loadRapidMappingData(map, allLayers) {
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_areaOfInterestA_r1_v3.json',
     {
-      color: '#000000',
-      fillOpacity: 0,
-      weight: 2
+      color: '#000000', // Schwarz
+      fillOpacity: 0,   // Kein Filling
+      weight: 0.5
     },
     'Area of Interest A',
     'AOI - Untersuchungsgebiet',
@@ -562,12 +562,12 @@ function showLayerGroupHierarchy(map) {
 }
 
 // Passe alle Stellen an, wo Layer hinzugefügt werden (z.B. nach Checkbox-Änderung)
-function addLayerWithHierarchy(map, groupName) {
+function addLayerWithHierarchy(map) {
   // Entferne alle Layer-Gruppen
   Object.values(layerGroups).forEach(function(group) {
     map.removeLayer(group);
   });
-  // Füge in richtiger Reihenfolge hinzu, aber nur die aktivierten Gruppen
+  // Füge in gewünschter Reihenfolge hinzu, falls aktiv
   if (map.hasLayer(layerGroups.aoi)) map.addLayer(layerGroups.aoi);
   if (map.hasLayer(layerGroups.floodedArea)) map.addLayer(layerGroups.floodedArea);
   if (map.hasLayer(layerGroups.floodTrace)) map.addLayer(layerGroups.floodTrace);
@@ -584,7 +584,7 @@ controlDiv.querySelectorAll('.layer-toggle[data-date="11_08"]').forEach(function
     } else {
       map.removeLayer(layerGroups[layerName]);
     }
-    addLayerWithHierarchy(map, layerName);
+    addLayerWithHierarchy(map);
   });
 });
 

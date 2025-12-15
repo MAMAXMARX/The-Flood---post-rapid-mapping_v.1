@@ -20,7 +20,7 @@ function loadRapidMappingData_19_07(map, allLayers) {
     {
       color: '#000000',
       fillOpacity: 0,
-      weight: 2
+      weight: 0.5
     },
     'Area of Interest A',
     'AOI - Untersuchungsgebiet',
