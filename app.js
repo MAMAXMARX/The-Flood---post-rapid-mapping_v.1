@@ -74,8 +74,19 @@ document.addEventListener('DOMContentLoaded', function () {
   // Funktion aus RM11.08.21.js aufrufen
   loadRapidMappingData(map, allLayers);
   
+  // Funktion aus RM19.07.21.js aufrufen
+  loadRapidMappingData_19_07(map, allLayers);
+  
   // Custom Layer Control für Rapid Mapping Daten erstellen
   createCustomLayerControl(map);
+  
+  // 19.07 Daten zur Legende hinzufügen
+  setTimeout(function() {
+    var legendControl = document.querySelector('.custom-layer-control');
+    if (legendControl) {
+      addLayerControl_19_07_ToExisting(legendControl, map);
+    }
+  }, 500);
 
   // Karte nach kurzer Verzögerung neu rendern
   setTimeout(function() { 
