@@ -65,14 +65,14 @@ document.addEventListener('DOMContentLoaded', function () {
   // RAPID MAPPING DATEN LADEN
   // ============================================
   
+  // Custom Layer Control erstellen (muss ZUERST erfolgen)
+  createCustomLayerControl(map);
+  
   // Funktion aus RM11.08.21.js aufrufen
   loadRapidMappingData(map, allLayers);
   
   // Funktion aus RM19.07.21.js aufrufen
   loadRapidMappingData_19_07(map, allLayers);
-  
-  // Custom Layer Control für Rapid Mapping Daten erstellen
-  createCustomLayerControl(map);
   
   // 19.07 Daten zur Legende hinzufügen
   setTimeout(function() {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (legendControl) {
       addLayerControl_19_07_ToExisting(legendControl, map);
     }
-  }, 500);
+  }, 300);
 
   // Karte nach kurzer Verzögerung neu rendern
   setTimeout(function() { 

@@ -283,7 +283,7 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
   `;
   
   // Event Listeners für Layer-Toggles (19.07)
-  section_19_07.querySelectorAll('.layer-toggle[data-date="19_07"]').forEach(function(checkbox) {
+  content_19_07.querySelectorAll('.layer-toggle[data-date="19_07"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
       var layerName = this.getAttribute('data-layer').replace('_19_07', '');
       if (this.checked) {
@@ -311,8 +311,8 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
           map.removeLayer(layerGroups_19_07.facilities);
         }
       } else if (category === 'flood') {
-        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
-        subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
+        var subcategoryDiv = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
+        subcategoryDiv.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
           if (this.checked) {
             subCheckbox.checked = true;
             var layerName = subCheckbox.getAttribute('data-layer').replace('_19_07', '');
