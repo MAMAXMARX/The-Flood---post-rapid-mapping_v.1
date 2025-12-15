@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rapid Mapping - EMSR517; AOI15 </title>
+  <title>Rapid Mapping - EMSR517; AOI15</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.css" />
   <style>
     /* Set the map container size */
     #map {
@@ -12,8 +13,51 @@
       width: 100%;
       min-height: 300px;
       min-width: 100px;
-      /* width: 100vw; entfernen! */
-      /* Dadurch bleibt die Karte immer im sichtbaren Bereich und es gibt kein horizontales Scrollen */
+    }
+    
+    /* ============================================ */
+    /* MONOCHROME FILTER - HIER IST DER FILTER! */
+    /* ============================================ */
+    #map.monochrome .leaflet-tile-pane {
+      filter: grayscale(100%) contrast(1.2) brightness(0.95);
+      -webkit-filter: grayscale(100%) contrast(1.2) brightness(0.95);
+    }
+    
+    /* Filter Control Button */
+    .filter-control {
+      position: absolute;
+      top: 10px;
+      left: 60px;
+      z-index: 1000;
+      background: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    
+    .filter-control:hover {
+      background: #f0f0f0;
+    }
+    
+    .filter-control input[type="checkbox"] {
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      margin: 0;
+    }
+    
+    .filter-control label {
+      cursor: pointer;
+      margin: 0;
+      font-weight: 500;
     }
     
     /* Custom Layer Control Styling - Kompakte Version */
@@ -257,13 +301,20 @@
         width: 100vw;
         min-height: 200px;
       }
-      /* ...existing code... */
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  
+  <!-- Monochrome Filter Toggle Button -->
+  <div class="filter-control">
+    <input type="checkbox" id="monochromeToggle">
+    <label for="monochromeToggle">Monochrome</label>
+  </div>
+  
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
   <!-- Zuerst die Daten-Funktionen laden -->
   <script src="RM11.08.21.js"></script>
   <script src="RM19.07.21.js"></script>

@@ -86,4 +86,38 @@ document.addEventListener('DOMContentLoaded', function () {
   setTimeout(function() { 
     map.invalidateSize(); 
   }, 100);
+  
+  // ============================================
+  // MONOCHROME FILTER TOGGLE
+  // ============================================
+  
+  var monochromeToggle = document.getElementById('monochromeToggle');
+  var mapElement = document.getElementById('map');
+  
+  monochromeToggle.addEventListener('change', function() {
+    if (this.checked) {
+      mapElement.classList.add('monochrome');
+      console.log('✓ Monochrome Filter aktiviert');
+    } else {
+      mapElement.classList.remove('monochrome');
+      console.log('✓ Monochrome Filter deaktiviert');
+    }
+  });
+  
+  // ============================================
+  // HOCHAUFLÖSENDER KARTEN-EXPORT
+  // ============================================
+  
+  L.easyPrint({
+    title: 'Karte als PNG exportieren',
+    position: 'topleft',
+    sizeModes: ['Current', 'A4Landscape', 'A4Portrait'],
+    filename: 'EMSR517_AOI15_Schuld_Flutkatastrophe',
+    exportOnly: true,
+    hideControlContainer: true,
+    hideClasses: ['filter-control', 'leaflet-control-layers', 'custom-layer-control'],
+    customWindowTitle: 'EMSR517 AOI15 - Schuld Flutkatastrophe Export'
+  }).addTo(map);
+  
+  console.log('✓ Karte geladen - Monochrome Filter & Export verfügbar');
 });
