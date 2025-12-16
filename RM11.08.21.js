@@ -228,7 +228,7 @@ function loadRapidMappingData(map, allLayers) {
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_areaOfInterestA_r1_v3.json',
     {
-      color: '#000000', // Schwarz
+      color: '#ffffffff', // Schwarz
       fillOpacity: 0,   // Kein Filling
       weight: 0.5
     },

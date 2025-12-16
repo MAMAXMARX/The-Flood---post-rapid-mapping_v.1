@@ -18,7 +18,7 @@ function loadRapidMappingData_19_07(map, allLayers) {
   loadGeoJSON(
     './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_areaOfInterestA_r1_v1.json',
     {
-      color: '#000000',
+      color: '#000000ff',
       fillOpacity: 0,
       weight: 0.5
     },
@@ -28,6 +28,20 @@ function loadRapidMappingData_19_07(map, allLayers) {
     allLayers,
     layerGroups_19_07.aoi
   );
+
+  loadGeoJSON(
+  './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_areaOfInterestA_r1_v1.json',
+  {
+    color: '#ffffff',   // innen weiß
+    fillOpacity: 0,
+    weight: 0.7         // dünner
+  },
+  'Area of Interest A',
+  'AOI - Untersuchungsgebiet',
+  map,
+  allLayers,
+  layerGroups_19_07.aoi
+);
 
   // Überschwemmungsgebiet
   loadGeoJSON_19_07(
