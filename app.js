@@ -56,10 +56,65 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   // Standard Layer Control für Basiskarten hinzufügen (unten links)
-  L.control.layers(baseMaps, {}, {
+  var layerControl = L.control.layers(baseMaps, {}, {
     position: 'bottomleft',
     collapsed: false
   }).addTo(map);
+  
+  // ============================================
+  // MONOCHROME FILTER IN LAYER CONTROL EINFÜGEN
+  // ============================================
+  
+  // Warte bis Layer Control im DOM ist
+  setTimeout(function() {
+    var layerControlContainer = document.querySelector('.leaflet-control-layers-base');
+    if (layerControlContainer) {
+      // Erstelle Separator
+      var separator = document.createElement('div');
+      separator.className = 'leaflet-control-layers-separator';
+      
+      // Erstelle Monochrome Filter Option
+      var filterDiv = document.createElement('label');
+      filterDiv.style.display = 'flex';
+      filterDiv.style.alignItems = 'center';
+      filterDiv.style.gap = '6px';
+      filterDiv.style.padding = '4px 0';
+      filterDiv.style.cursor = 'pointer';
+      filterDiv.style.fontSize = '12px';
+      filterDiv.style.marginTop = '8px';
+      
+      var checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = 'monochromeToggle';
+      checkbox.style.cursor = 'pointer';
+      checkbox.style.width = '14px';
+      checkbox.style.height = '14px';
+      checkbox.style.margin = '0';
+      
+      var label = document.createElement('span');
+      label.textContent = 'Monochrome Filter';
+      label.style.fontWeight = '500';
+      
+      filterDiv.appendChild(checkbox);
+      filterDiv.appendChild(label);
+      
+      // Füge nach der Base-Layer-Sektion ein
+      layerControlContainer.parentNode.insertBefore(separator, layerControlContainer.nextSibling);
+      layerControlContainer.parentNode.insertBefore(filterDiv, separator.nextSibling);
+      
+      // Event Listener für Monochrome Toggle
+      var mapElement = document.getElementById('map');
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          mapElement.classList.add('monochrome');
+          console.log('✓ Monochrome Filter aktiviert');
+        } else {
+          mapElement.classList.remove('monochrome');
+          console.log('✓ Monochrome Filter deaktiviert');
+        }
+      });
+    }
+  }, 100);
 
   // ============================================
   // RAPID MAPPING DATEN LADEN
@@ -88,23 +143,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }, 100);
   
   // ============================================
-  // MONOCHROME FILTER TOGGLE
-  // ============================================
-  
-  var monochromeToggle = document.getElementById('monochromeToggle');
-  var mapElement = document.getElementById('map');
-  
-  monochromeToggle.addEventListener('change', function() {
-    if (this.checked) {
-      mapElement.classList.add('monochrome');
-      console.log('✓ Monochrome Filter aktiviert');
-    } else {
-      mapElement.classList.remove('monochrome');
-      console.log('✓ Monochrome Filter deaktiviert');
-    }
-  });
-  
-  // ============================================
   // HOCHAUFLÖSENDER KARTEN-EXPORT
   // ============================================
   
@@ -115,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
     filename: 'EMSR517_AOI15_Schuld_Flutkatastrophe',
     exportOnly: true,
     hideControlContainer: true,
-    hideClasses: ['filter-control', 'leaflet-control-layers', 'custom-layer-control'],
+    hideClasses: ['leaflet-control-layers', 'custom-layer-control'],
     customWindowTitle: 'EMSR517 AOI15 - Schuld Flutkatastrophe Export'
   }).addTo(map);
   

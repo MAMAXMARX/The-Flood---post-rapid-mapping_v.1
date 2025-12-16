@@ -23,43 +23,6 @@
       -webkit-filter: grayscale(100%) contrast(1.2) brightness(0.95);
     }
     
-    /* Filter Control Button */
-    .filter-control {
-      position: absolute;
-      top: 10px;
-      left: 60px;
-      z-index: 1000;
-      background: white;
-      padding: 8px 12px;
-      border-radius: 5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      cursor: pointer;
-      font-family: Arial, sans-serif;
-      font-size: 12px;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.2s;
-    }
-    
-    .filter-control:hover {
-      background: #f0f0f0;
-    }
-    
-    .filter-control input[type="checkbox"] {
-      cursor: pointer;
-      width: 14px;
-      height: 14px;
-      margin: 0;
-    }
-    
-    .filter-control label {
-      cursor: pointer;
-      margin: 0;
-      font-weight: 500;
-    }
-    
     /* Custom Layer Control Styling - Kompakte Version */
     .custom-layer-control {
       background: white;
@@ -248,6 +211,13 @@
       border-bottom: 1px solid #ddd;
     }
     
+    /* Monochrome Filter im Layer Control */
+    .leaflet-control-layers-separator {
+      height: 0;
+      border-top: 1px solid #ddd;
+      margin: 8px 0;
+    }
+    
     /* Zoom Control Styling */
     .leaflet-control-zoom {
       border-radius: 5px;
@@ -306,12 +276,6 @@
 </head>
 <body>
   <div id="map"></div>
-  
-  <!-- Monochrome Filter Toggle Button -->
-  <div class="filter-control">
-    <input type="checkbox" id="monochromeToggle">
-    <label for="monochromeToggle">Monochrome</label>
-  </div>
   
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
