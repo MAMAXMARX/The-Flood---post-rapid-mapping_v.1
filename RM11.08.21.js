@@ -224,16 +224,37 @@ function updateMapView(map, allLayers) {
 
 // Hauptfunktion zum Laden aller Rapid Mapping Daten
 function loadRapidMappingData(map, allLayers) {
-  // Untersuchungsgebiet (schwarz, kein Filling)
+  // ============================================
+  // UNTERSUCHUNGSGEBIET MIT DOPPELTER KONTUR
+  // ============================================
+  
+  // 1. Äußere Kontur (SCHWARZ, dicker)
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_areaOfInterestA_r1_v3.json',
     {
-      color: '#ffffffff', // Schwarz
-      fillOpacity: 0,   // Kein Filling
-      weight: 0.5
+      color: '#000000',     // Schwarz
+      fillOpacity: 0,       // Kein Filling
+      weight: 3,            // Dicker für äußere Kontur
+      opacity: 1
     },
-    'Area of Interest A',
-    'AOI - Untersuchungsgebiet',
+    'Area of Interest A (Outer)',
+    'AOI - Untersuchungsgebiet (äußere Kontur)',
+    map,
+    allLayers,
+    layerGroups.aoi
+  );
+
+  // 2. Innere Kontur (WEISS, dünner)
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_areaOfInterestA_r1_v3.json',
+    {
+      color: '#FFFFFF',     // Weiß
+      fillOpacity: 0,       // Kein Filling
+      weight: 1.5,          // Dünner für innere Kontur
+      opacity: 1
+    },
+    'Area of Interest A (Inner)',
+    'AOI - Untersuchungsgebiet (innere Kontur)',
     map,
     allLayers,
     layerGroups.aoi

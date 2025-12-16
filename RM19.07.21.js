@@ -1,6 +1,6 @@
 // ============================================
 // RAPID MAPPING DATEN - 19.07.2021
-// EMSR517 AOI15 - Schuld Flutkatastrophe
+// EMSR517 AOI15 - Ahrtal Flutkatastrophe
 // ============================================
 
 // Layer-Gruppen für die Legende (19.07 Daten)
@@ -14,34 +14,41 @@ var layerGroups_19_07 = {
 
 // Hauptfunktion zum Laden aller Rapid Mapping Daten vom 19.07.2021
 function loadRapidMappingData_19_07(map, allLayers) {
-  // Untersuchungsgebiet (schwarz, kein Filling)
+  // ============================================
+  // UNTERSUCHUNGSGEBIET MIT DOPPELTER KONTUR
+  // ============================================
+  
+  // 1. Äußere Kontur (SCHWARZ, dicker)
   loadGeoJSON(
     './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_areaOfInterestA_r1_v1.json',
     {
-      color: '#000000ff',
-      fillOpacity: 0,
-      weight: 0.5
+      color: '#000000',     // Schwarz
+      fillOpacity: 0,       // Kein Filling
+      weight: 3,            // Dicker für äußere Kontur
+      opacity: 1
     },
-    'Area of Interest A',
-    'AOI - Untersuchungsgebiet',
+    'Area of Interest A (Outer)',
+    'AOI - Untersuchungsgebiet (äußere Kontur)',
     map,
     allLayers,
     layerGroups_19_07.aoi
   );
 
+  // 2. Innere Kontur (WEISS, dünner) - wird ÜBER der schwarzen gezeichnet
   loadGeoJSON(
-  './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_areaOfInterestA_r1_v1.json',
-  {
-    color: '#ffffff',   // innen weiß
-    fillOpacity: 0,
-    weight: 0.7         // dünner
-  },
-  'Area of Interest A',
-  'AOI - Untersuchungsgebiet',
-  map,
-  allLayers,
-  layerGroups_19_07.aoi
-);
+    './19.07.2021_EMSR517_json/EMSR517_AOI15_GRA_PRODUCT_areaOfInterestA_r1_v1.json',
+    {
+      color: '#FFFFFF',     // Weiß
+      fillOpacity: 0,       // Kein Filling
+      weight: 1.5,          // Dünner für innere Kontur
+      opacity: 1
+    },
+    'Area of Interest A (Inner)',
+    'AOI - Untersuchungsgebiet (innere Kontur)',
+    map,
+    allLayers,
+    layerGroups_19_07.aoi
+  );
 
   // Überschwemmungsgebiet
   loadGeoJSON_19_07(
@@ -217,7 +224,7 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       <label class="legend-item-compact">
         <input type="checkbox" class="layer-toggle" data-layer="aoi_19_07" data-date="19_07">
         <span class="layer-name">Untersuchungsgebiet</span>
-        <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
+        <span class="legend-symbol-small" style="border: 2px solid #000000; box-shadow: inset 0 0 0 1px #ffffff; background: transparent;"></span>
       </label>
     </div>
     <div class="legend-section-compact">
@@ -293,7 +300,6 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
         </label>
       </div>
     </div>
-    </div>
   `;
   
   // Event Listeners für Layer-Toggles (19.07)
@@ -310,7 +316,7 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
 
   // Event Listeners für Kategorie-Toggles (19.07)
   content_19_07.querySelectorAll('.category-toggle[data-date="19_07"]').forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener('change', function(e) {
       var category = this.getAttribute('data-category').replace('_19_07', '');
       if (category === 'buildings') {
         if (this.checked) {
@@ -338,6 +344,27 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
           }
         }.bind(this));
       }
+      e.stopPropagation();
+    });
+  });
+
+  // Subtype-Toggles für Gebäudeschäden/Infrastruktur (19.07)
+  content_19_07.querySelectorAll('.subtype-toggle[data-date="19_07"]').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function(e) {
+      var type = this.getAttribute('data-type');
+      var group = this.getAttribute('data-group');
+      var checked = this.checked;
+      
+      layerGroups_19_07[group].eachLayer(function(layer) {
+        if (layer.feature && layer.feature.properties && layer.feature.properties.damage_gra === type) {
+          if (checked) {
+            if (!map.hasLayer(layer)) map.addLayer(layer);
+          } else {
+            if (map.hasLayer(layer)) map.removeLayer(layer);
+          }
+        }
+      });
+      e.stopPropagation();
     });
   });
 
@@ -347,7 +374,7 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       if (e.target.classList.contains('toggle-icon-small') || e.target.tagName === 'STRONG') {
         var icon = this.querySelector('.toggle-icon-small');
         var subcategory = this.parentElement.querySelector('.legend-subcategory-compact');
-        if (subcategory.style.display === 'none') {
+        if (subcategory.style.display === 'none' || subcategory.style.display === '') {
           subcategory.style.display = 'block';
           icon.textContent = '▼';
         } else {
@@ -357,43 +384,4 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       }
     });
   });
-  
-  // Layer-Gruppen NICHT sofort hinzufügen - bleiben ausgeblendet
 }
-
-function showLayerGroupHierarchy_19_07(map) {
-  Object.values(layerGroups_19_07).forEach(function(group) {
-    map.removeLayer(group);
-  });
-  map.addLayer(layerGroups_19_07.aoi);
-  map.addLayer(layerGroups_19_07.floodedArea);
-  map.addLayer(layerGroups_19_07.floodTrace);
-  map.addLayer(layerGroups_19_07.facilities);
-  map.addLayer(layerGroups_19_07.buildings);
-}
-
-function addLayerWithHierarchy_19_07(map, groupName) {
-  Object.values(layerGroups_19_07).forEach(function(group) {
-    map.removeLayer(group);
-  });
-  if (map.hasLayer(layerGroups_19_07.aoi)) map.addLayer(layerGroups_19_07.aoi);
-  if (map.hasLayer(layerGroups_19_07.floodedArea)) map.addLayer(layerGroups_19_07.floodedArea);
-  if (map.hasLayer(layerGroups_19_07.floodTrace)) map.addLayer(layerGroups_19_07.floodTrace);
-  if (map.hasLayer(layerGroups_19_07.facilities)) map.addLayer(layerGroups_19_07.facilities);
-  if (map.hasLayer(layerGroups_19_07.buildings)) map.addLayer(layerGroups_19_07.buildings);
-}
-
-// Beispiel: Im Event-Listener für Checkboxen nach dem Hinzufügen/Entfernen:
-content_19_07.querySelectorAll('.layer-toggle[data-date="19_07"]').forEach(function(checkbox) {
-  checkbox.addEventListener('change', function() {
-    var layerName = this.getAttribute('data-layer').replace('_19_07', '');
-    if (this.checked) {
-      map.addLayer(layerGroups_19_07[layerName]);
-    } else {
-      map.removeLayer(layerGroups_19_07[layerName]);
-    }
-    addLayerWithHierarchy_19_07(map, layerName);
-  });
-});
-
-// Gleiches Prinzip für Kategorie-Toggles und Section-Toggles anwenden
