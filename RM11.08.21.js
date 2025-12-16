@@ -1,6 +1,6 @@
 // ============================================
 // RAPID MAPPING DATEN - 11.08.2021
-// EMSR517 AOI15 - Schuld Flutkatastrophe
+// EMSR517 AOI15 - Ahrtal Flutkatastrophe
 // ============================================
 
 // Layer-Gruppen für die Legende
@@ -234,7 +234,7 @@ function loadRapidMappingData(map, allLayers) {
     {
       color: '#000000',     // Schwarz
       fillOpacity: 0,       // Kein Filling
-      weight: 3,            // Dicker für äußere Kontur
+      weight: 1.5,            // Dicker für äußere Kontur
       opacity: 1
     },
     'Area of Interest A (Outer)',
@@ -250,7 +250,7 @@ function loadRapidMappingData(map, allLayers) {
     {
       color: '#FFFFFF',     // Weiß
       fillOpacity: 0,       // Kein Filling
-      weight: 1.5,          // Dünner für innere Kontur
+      weight: 0.75,          // Dünner für innere Kontur
       opacity: 1
     },
     'Area of Interest A (Inner)',
