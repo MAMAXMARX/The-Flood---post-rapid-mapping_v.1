@@ -16,14 +16,14 @@
     }
     
     /* ============================================ */
-    /* MONOCHROME FILTER - HIER IST DER FILTER! */
+    /* MONOCHROME FILTER */
     /* ============================================ */
     #map.monochrome .leaflet-tile-pane {
       filter: grayscale(100%) contrast(1.2) brightness(0.95);
       -webkit-filter: grayscale(100%) contrast(1.2) brightness(0.95);
     }
     
-    /* Custom Layer Control Styling - Kompakte Version */
+    /* Custom Layer Control Styling */
     .custom-layer-control {
       background: white;
       padding: 12px;
@@ -279,9 +279,14 @@
   
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
+  
   <!-- Zuerst die Daten-Funktionen laden -->
   <script src="RM11.08.21.js"></script>
   <script src="RM19.07.21.js"></script>
+  
+  <!-- NEU: Layer.js für Luftbilder 2019/2021 und Hochwasserlinie -->
+  <script src="Layer.js"></script>
+  
   <!-- Dann die Hauptanwendung -->
   <script src="app.js"></script>
 </body>

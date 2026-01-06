@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', function () {
     collapsed: false
   }).addTo(map);
   
+  // Speichere Layer Control global für Ahrtal-Layer
+  window.globalLayerControl = layerControl;
+  
   // ============================================
   // MONOCHROME FILTER IN LAYER CONTROL EINFÜGEN
   // ============================================
@@ -136,6 +139,20 @@ document.addEventListener('DOMContentLoaded', function () {
       addLayerControl_19_07_ToExisting(legendControl, map);
     }
   }, 300);
+  
+  // ============================================
+  // NEU: AHRTAL LAYER LADEN (Luftbilder & ÜSG)
+  // ============================================
+  
+  // Lade Ahrtal-Layer aus Layer.js
+  if (typeof loadAhrtalLayers === 'function') {
+    setTimeout(function() {
+      loadAhrtalLayers(map, allLayers);
+      console.log('✅ Ahrtal-Layer (Luftbilder 2019/2021 & Hochwasserlinie) werden geladen...');
+    }, 500);
+  } else {
+    console.warn('⚠️ loadAhrtalLayers Funktion nicht gefunden - Layer.js geladen?');
+  }
 
   // Karte nach kurzer Verzögerung neu rendern
   setTimeout(function() { 
@@ -158,4 +175,5 @@ document.addEventListener('DOMContentLoaded', function () {
   }).addTo(map);
   
   console.log('✓ Karte geladen - Monochrome Filter & Export verfügbar');
+  console.log('🌊 Ahrtal-Layer-Integration aktiviert');
 });
