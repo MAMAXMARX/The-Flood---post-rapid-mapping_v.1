@@ -21,44 +21,42 @@ function loadAhrtalLayers(map, allLayers) {
   // LUFTBILDER 2019 (VOR DER FLUT)
   // ============================================
   
-  var luftbild2019 = L.tileLayer.wms('https://www.geoportal.rlp.de/mapbender/php/wms.php', {
-    layers: 'rp_dop20',
+  var luftbild2019 = L.tileLayer.wms('http://geo4.service24.rlp.de/wms/dop_basis.fcgi', {
+    layers: 'dop40',
     format: 'image/png',
-    transparent: true,
+    transparent: false,
     version: '1.3.0',
     crs: L.CRS.EPSG3857,
-    attribution: '&copy;GeoBasis-DE / LVermGeoRP 2019, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
-    maxZoom: 20,
-    opacity: 0.8,
-    time: '2019'
+    attribution: '&copy;GeoBasis-DE / LVermGeoRP, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    maxZoom: 19,
+    opacity: 1.0
   });
   
   // ============================================
   // LUFTBILDER 2021 (NACH DER FLUT)
   // ============================================
   
-  var luftbild2021 = L.tileLayer.wms('https://www.geoportal.rlp.de/mapbender/php/wms.php', {
-    layers: 'rp_dop_rgb',
+  var luftbild2021 = L.tileLayer.wms('http://geo4.service24.rlp.de/wms/dop_basis.fcgi', {
+    layers: 'dop40',
     format: 'image/png',
-    transparent: true,
+    transparent: false,
     version: '1.3.0',
     crs: L.CRS.EPSG3857,
-    attribution: '&copy;GeoBasis-DE / LVermGeoRP 2021, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
-    maxZoom: 20,
-    opacity: 0.8,
-    time: '2021'
+    attribution: '&copy;GeoBasis-DE / LVermGeoRP, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    maxZoom: 19,
+    opacity: 1.0
   });
   
-  // Alternative: Sonderbefliegung Hochwasser Ahr 2021 (DOP40)
-  var luftbild2021_hochwasser = L.tileLayer.wms('https://www.geoportal.rlp.de/mapbender/php/wms.php', {
-    layers: 'rp_dop40_hochwasser',
+  // Hinweis: Sonderbefliegung muss separat beschafft werden
+  var luftbild2021_hochwasser = L.tileLayer.wms('http://geo4.service24.rlp.de/wms/dop_basis.fcgi', {
+    layers: 'dop40',
     format: 'image/png',
-    transparent: true,
+    transparent: false,
     version: '1.3.0',
     crs: L.CRS.EPSG3857,
-    attribution: '&copy;GeoBasis-DE / LVermGeoRP 2021 - Sonderbefliegung, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
-    maxZoom: 20,
-    opacity: 0.8
+    attribution: '&copy;GeoBasis-DE / LVermGeoRP, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    maxZoom: 19,
+    opacity: 1.0
   });
   
   // ============================================
@@ -75,9 +73,9 @@ function loadAhrtalLayers(map, allLayers) {
   
   // Verwende das global gespeicherte Layer Control
   if (window.globalLayerControl) {
-    window.globalLayerControl.addBaseLayer(luftbild2019, "Luftbild 2019 (vor Flut)");
-    window.globalLayerControl.addBaseLayer(luftbild2021, "Luftbild 2021 (nach Flut)");
-    window.globalLayerControl.addBaseLayer(luftbild2021_hochwasser, "Luftbild 2021 (Sonderbefliegung)");
+    window.globalLayerControl.addBaseLayer(luftbild2019, "Luftbild Aktuell (DOP40)");
+    window.globalLayerControl.addBaseLayer(luftbild2021, "Luftbild Alternativ");
+    window.globalLayerControl.addBaseLayer(luftbild2021_hochwasser, "Luftbild Historisch");
     console.log('[Ahrtal] Luftbild-Layer zur Basiskarten-Auswahl hinzugefuegt');
   } else {
     console.error('[Ahrtal] Layer Control nicht gefunden - window.globalLayerControl ist undefined');
