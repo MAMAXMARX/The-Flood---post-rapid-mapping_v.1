@@ -90,52 +90,38 @@ function loadAhrtalLayers(map, allLayers) {
   // Speichere Map-Referenz global fuer spaetere Verwendung
   window.ahrtalMap = map;
   
-  // Lade UESG-Daten als GeoJSON
-  loadUESGData(map, allLayers);
+  // Lade UESG-Daten aus lokaler JSON-Datei
+  loadUESGDataFromFile(map, allLayers);
   
   console.log('[Ahrtal] Ahrtal-Layer erfolgreich initialisiert');
 }
 
 // ============================================
-// UESG-DATEN LADEN
+// UESG-DATEN AUS LOKALER JSON-DATEI LADEN
 // ============================================
 
-function loadUESGData(map, allLayers) {
-  console.log('[UESG] Lade Ueberschwemmungsgebiet-Daten...');
+function loadUESGDataFromFile(map, allLayers) {
+  console.log('[UESG] Lade Ueberschwemmungsgebiet-Daten aus lokaler Datei...');
   
-  var uesgLayer = null;
-  
-  // Versuche GeoJSON API
-  fetch('https://www.geoportal.rlp.de/spatial-objects/325/collections/uesg:uesg_gesetzlich/items?f=json&limit=10000')
-    .then(response => {
+  // Lade lokale JSON-Datei
+  fetch('uesg_ahr.json')
+    .then(function(response) {
       if (!response.ok) {
-        console.warn('[UESG] GeoJSON API nicht verfuegbar, versuche WFS...');
-        return fetch('https://geodienste-wasser.rlp-umwelt.de/geoserver/uesg/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=uesg:uesg_gesetzlich&outputFormat=application/json&srsName=EPSG:4326');
+        throw new Error('UESG JSON-Datei nicht gefunden: ' + response.status);
       }
-      return response;
+      return response.json();
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(function(data) {
       console.log('[UESG] Daten erfolgreich geladen:', data);
       
-      // Filtere Ahr-Daten
-      var ahrFeatures = [];
-      if (data.features) {
-        ahrFeatures = data.features.filter(function(f) {
-          var name = (f.properties && (f.properties.gewaesser || f.properties.name || f.properties.GEWAESSER)) || '';
-          return name.toLowerCase().includes('ahr');
-        });
-      }
-      
-      if (ahrFeatures.length === 0) {
-        console.log('[UESG] Keine Ahr-spezifischen Daten gefunden, verwende alle Features');
-        ahrFeatures = data.features || [];
-      }
-      
-      console.log('[UESG] Ahr-Features gefunden:', ahrFeatures.length);
+      // Die Datei enthaelt ein einzelnes Feature, konvertiere zu FeatureCollection
+      var featureCollection = {
+        type: 'FeatureCollection',
+        features: [data]
+      };
       
       // Erstelle GeoJSON Layer
-      uesgLayer = L.geoJSON(ahrFeatures, {
+      var uesgLayer = L.geoJSON(featureCollection, {
         style: function(feature) {
           return {
             color: '#0066cc',
@@ -150,16 +136,19 @@ function loadUESGData(map, allLayers) {
           var props = feature.properties || {};
           var popupContent = '<div style="font-family: Arial; font-size: 12px;">';
           popupContent += '<strong>Ueberschwemmungsgebiet Ahr</strong><br>';
-          popupContent += '<em>Vorlaeufig sichergestellt (Par.76 Abs. 3 WHG)</em><br><br>';
+          popupContent += '<em>' + (props.STAND_BEZ || 'Vorlaeufig sichergestellt') + '</em><br><br>';
           
-          if (props.gewaesser || props.GEWAESSER) {
-            popupContent += '<strong>Gewaesser:</strong> ' + (props.gewaesser || props.GEWAESSER) + '<br>';
+          if (props.GEW_NAME) {
+            popupContent += '<strong>Gewaesser:</strong> ' + props.GEW_NAME + '<br>';
           }
-          if (props.hq || props.HQ) {
-            popupContent += '<strong>Bemessungshochwasser:</strong> HQ' + (props.hq || props.HQ) + '<br>';
+          if (props.HQ) {
+            popupContent += '<strong>Bemessungshochwasser:</strong> HQ ' + props.HQ + '<br>';
           }
-          if (props.datum || props.DATUM) {
-            popupContent += '<strong>Datum:</strong> ' + (props.datum || props.DATUM) + '<br>';
+          if (props.RVO_DATUM) {
+            popupContent += '<strong>Datum:</strong> ' + props.RVO_DATUM + '<br>';
+          }
+          if (props.STRECKE) {
+            popupContent += '<strong>Strecke:</strong> ' + props.STRECKE + '<br>';
           }
           
           popupContent += '<br><small>Datenquelle: <a href="https://sgdnord.rlp.de" target="_blank">SGD Nord RLP</a></small>';
@@ -179,24 +168,8 @@ function loadUESGData(map, allLayers) {
       console.log('[UESG] Layer erfolgreich erstellt und zur Legende hinzugefuegt');
     })
     .catch(function(error) {
-      console.error('[UESG] Fehler beim Laden der Daten:', error);
-      console.log('[UESG] Verwende WMS-Fallback');
-      
-      // Fallback: WMS-Layer
-      uesgLayer = L.tileLayer.wms('https://geodienste-wasser.rlp-umwelt.de/maps/uesg/wms', {
-        layers: 'uesg:uesg_gesetzlich',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        crs: L.CRS.EPSG3857,
-        attribution: '&copy; RLP-UMWELT Wasserportal',
-        maxZoom: 20,
-        opacity: 0.6
-      });
-      
-      window.uesgAhrLayer = uesgLayer;
-      allLayers.push(uesgLayer);
-      addUESGToLegend(map);
+      console.error('[UESG] Fehler beim Laden der lokalen Datei:', error);
+      console.log('[UESG] Stelle sicher, dass uesg_ahr.json im gleichen Verzeichnis wie index.html liegt');
     });
 }
 
