@@ -144,6 +144,13 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
       
       features.forEach((feature, index) => {
         if (feature.geometry) {
+          // FILTER: Für notAnalysed Layer nur "Not Analysed" Features laden
+          if (targetGroup === layerGroups.notAnalysed) {
+            if (!feature.properties || feature.properties.obj_type !== 'Not Analysed') {
+              return; // Überspringe "Image Footprint" und andere
+            }
+          }
+          
           var geomType = feature.geometry.type;
           
           if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
@@ -413,11 +420,12 @@ function loadRapidMappingData(map, allLayers) {
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_imageFootprintA_r1_v3.json',
     {
-      color: '#666666',
-      fillColor: '#eeeeee',
-      fillOpacity: 0.5,
+      color: '#999999',
       weight: 1,
-      dashArray: '5, 5'
+      opacity: 0.8,
+      fillColor: '#cccccc',
+      fillOpacity: 0.3,
+      dashArray: '4, 4'
     },
     'Nicht analysierte Bereiche',
     'Image Footprint - Not Analysed',
@@ -431,9 +439,8 @@ function loadRapidMappingData(map, allLayers) {
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyL_r1_v3.json',
     {
       color: '#0066cc',
-      fillColor: '#6699cc',
-      fillOpacity: 0.4,
-      weight: 1
+      weight: 2,
+      opacity: 0.7
     },
     'Hydrographie',
     'Hydrography Lines',
