@@ -12,9 +12,7 @@ var layerGroups = {
   facilities: L.layerGroup(),
   transportation: L.layerGroup(),
   notAnalysed: L.layerGroup(),
-  rivers: L.layerGroup(),
-  lakes: L.layerGroup(),
-  vegetation: L.layerGroup()
+  hydrography: L.layerGroup()
 };
 
 function getFacilityStyle(damageGrade) {
@@ -428,22 +426,23 @@ function loadRapidMappingData(map, allLayers) {
     layerGroups.notAnalysed
   );
   
-  // Flüsse und Bäche
+  // Hydrographie - Flüsse und Bäche
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyL_r1_v3.json',
     {
       color: '#0066cc',
-      weight: 2,
-      opacity: 0.7
+      fillColor: '#6699cc',
+      fillOpacity: 0.4,
+      weight: 1
     },
-    'Flüsse & Bäche',
+    'Hydrographie',
     'Hydrography Lines',
     map,
     allLayers,
-    layerGroups.rivers
+    layerGroups.hydrography
   );
   
-  // Seen und Teiche
+  // Hydrographie - Seen und Teiche
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyA_r1_v3.json',
     {
@@ -452,27 +451,11 @@ function loadRapidMappingData(map, allLayers) {
       fillOpacity: 0.4,
       weight: 1
     },
-    'Seen & Teiche',
+    'Hydrographie',
     'Hydrography Areas',
     map,
     allLayers,
-    layerGroups.lakes
-  );
-  
-  // Vegetation und Wälder
-  loadGeoJSON(
-    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_naturalLandUseA_r1_v3.json',
-    {
-      color: '#228B22',
-      fillColor: '#90EE90',
-      fillOpacity: 0.3,
-      weight: 1
-    },
-    'Vegetation & Wälder',
-    'Natural Land Use',
-    map,
-    allLayers,
-    layerGroups.vegetation
+    layerGroups.hydrography
   );
 }
 
@@ -637,19 +620,9 @@ function createCustomLayerControl(map) {
               <span class="legend-symbol-small" style="background: #eeeeee; border: 1px dashed #666666;"></span>
             </label>
             <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="rivers" data-date="11_08">
-              <span class="layer-name">Flüsse & Bäche</span>
-              <span class="legend-symbol-small" style="background: #0066cc; border: none; height: 2px;"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="lakes" data-date="11_08">
-              <span class="layer-name">Seen & Teiche</span>
+              <input type="checkbox" class="layer-toggle" data-layer="hydrography" data-date="11_08">
+              <span class="layer-name">Hydrographie</span>
               <span class="legend-symbol-small" style="background: #6699cc; border: 1px solid #0066cc;"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="vegetation" data-date="11_08">
-              <span class="layer-name">Vegetation & Wälder</span>
-              <span class="legend-symbol-small" style="background: #90EE90; border: 1px solid #228B22;"></span>
             </label>
           </div>
         </div>
@@ -841,9 +814,7 @@ function showLayerGroupHierarchy(map) {
     map.removeLayer(group);
   });
   // Füge in gewünschter Reihenfolge hinzu
-  map.addLayer(layerGroups.lakes);
-  map.addLayer(layerGroups.rivers);
-  map.addLayer(layerGroups.vegetation);
+  map.addLayer(layerGroups.hydrography);
   map.addLayer(layerGroups.aoi);
   map.addLayer(layerGroups.floodedArea);
   map.addLayer(layerGroups.floodTrace);
@@ -860,9 +831,7 @@ function addLayerWithHierarchy(map) {
     map.removeLayer(group);
   });
   // Füge in gewünschter Reihenfolge hinzu, falls aktiv
-  if (map.hasLayer(layerGroups.lakes)) map.addLayer(layerGroups.lakes);
-  if (map.hasLayer(layerGroups.rivers)) map.addLayer(layerGroups.rivers);
-  if (map.hasLayer(layerGroups.vegetation)) map.addLayer(layerGroups.vegetation);
+  if (map.hasLayer(layerGroups.hydrography)) map.addLayer(layerGroups.hydrography);
   if (map.hasLayer(layerGroups.aoi)) map.addLayer(layerGroups.aoi);
   if (map.hasLayer(layerGroups.floodedArea)) map.addLayer(layerGroups.floodedArea);
   if (map.hasLayer(layerGroups.floodTrace)) map.addLayer(layerGroups.floodTrace);
