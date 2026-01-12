@@ -9,31 +9,32 @@ var layerGroups = {
   buildings: L.layerGroup(),
   floodedArea: L.layerGroup(),
   floodTrace: L.layerGroup(),
-  facilities: L.layerGroup()
+  facilities: L.layerGroup(),
+  transportation: L.layerGroup()
 };
 
 function getFacilityStyle(damageGrade) {
-  // Für Facilities (Polygone) andere Farben als für Gebäude (Punkte)
+  // EINHEITLICHE Farbcodierung für Facilities (Polygone) wie bei Gebäuden (Punkte)
   switch(damageGrade) {
     case 'Destroyed':
       return {
-        color: '#8B0000',
-        fillColor: '#8B0000',
-        fillOpacity: 0.4,
+        color: '#3d0707',
+        fillColor: '#3d070758',
+        fillOpacity: 0.6,
         weight: 2
       };
     case 'Damaged':
       return {
-        color: '#FF6347',
-        fillColor: '#FF6347',
-        fillOpacity: 0.4,
+        color: '#ac3d3d',
+        fillColor: '#ac3d3d62',
+        fillOpacity: 0.6,
         weight: 2
       };
     case 'Possibly damaged':
       return {
-        color: '#FFA500',
-        fillColor: '#FFA500',
-        fillOpacity: 0.3,
+        color: '#ffb554',
+        fillColor: '#ffb55459',
+        fillOpacity: 0.5,
         weight: 2
       };
     default:
@@ -81,6 +82,49 @@ function getFloodStyle(notation) {
     fillOpacity: 0.5,
     weight: 1
   };
+}
+
+function getTransportationStyle(damageGrade) {
+  // Spezielle Styles für Transportation (LineStrings)
+  switch(damageGrade) {
+    case 'Destroyed':
+      return {
+        color: '#3d0707',
+        weight: 3,
+        opacity: 0.9
+      };
+    case 'Damaged':
+      return {
+        color: '#ac3d3d',
+        weight: 3,
+        opacity: 0.8
+      };
+    case 'Possibly damaged':
+      return {
+        color: '#ffb554',
+        weight: 3,
+        opacity: 0.7
+      };
+    case 'No visible damage':
+      return {
+        color: '#999999',
+        weight: 2,
+        opacity: 0.6
+      };
+    case 'Not Analysed':
+      return {
+        color: '#cccccc',
+        weight: 2,
+        opacity: 0.5,
+        dashArray: '5, 5'  // Gestrichelt
+      };
+    default:
+      return {
+        color: '#999999',
+        weight: 2,
+        opacity: 0.5
+      };
+  }
 }
 
 function loadGeoJSON(url, style, layerName, description, map, allLayers, targetGroup) {
@@ -202,6 +246,70 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             circleMarker.bindPopup(popupContent);
             allLayers.push(circleMarker);
           }
+          
+          else if (geomType === 'LineString' || geomType === 'MultiLineString') {
+            var coords = feature.geometry.coordinates;
+            var leafletCoords;
+            
+            // MultiLineString vs LineString
+            if (geomType === 'MultiLineString') {
+              // MultiLineString: Array von LineStrings
+              leafletCoords = coords.map(function(lineString) {
+                return lineString.map(function(coord) {
+                  return [coord[1], coord[0]];
+                });
+              });
+            } else {
+              // Einzelner LineString
+              leafletCoords = [coords.map(function(coord) {
+                return [coord[1], coord[0]];
+              })];
+            }
+            
+            var damageGrade = feature.properties ? feature.properties.damage_gra : null;
+            var lineStyle = getTransportationStyle(damageGrade);
+            
+            // Erstelle Polyline(s)
+            leafletCoords.forEach(function(lineCoords) {
+              var polyline = L.polyline(lineCoords, lineStyle);
+              
+              // Zu entsprechender Gruppe hinzufügen
+              if (targetGroup) {
+                polyline.addTo(targetGroup);
+              } else {
+                polyline.addTo(map);
+              }
+              
+              var popupContent = `<b>${layerName}</b><br>`;
+              popupContent += `<i>${description}</i><br>`;
+              
+              if (feature.properties) {
+                if (feature.properties.damage_gra) {
+                  var damageColor = lineStyle.color;
+                  popupContent += `<br><b style="color: ${damageColor}">● Schaden:</b> ${feature.properties.damage_gra}<br>`;
+                }
+                if (feature.properties.obj_type) {
+                  popupContent += `<b>Typ:</b> ${feature.properties.obj_type}<br>`;
+                }
+                if (feature.properties.info) {
+                  popupContent += `<b>Info:</b> ${feature.properties.info}<br>`;
+                }
+                if (feature.properties.name && feature.properties.name !== 'Unknown') {
+                  popupContent += `<b>Name:</b> ${feature.properties.name}<br>`;
+                }
+                
+                popupContent += '<br><b>Details:</b><br>';
+                for (var key in feature.properties) {
+                  if (key !== 'damage_gra' && key !== 'obj_type' && key !== 'info' && key !== 'name') {
+                    popupContent += `${key}: ${feature.properties[key]}<br>`;
+                  }
+                }
+              }
+              
+              polyline.bindPopup(popupContent);
+              allLayers.push(polyline);
+            });
+          }
         }
       });
 
@@ -218,11 +326,9 @@ function updateMapView(map, allLayers) {
   if (allLayers.length > 0) {
     var group = L.featureGroup(allLayers);
     map.fitBounds(group.getBounds(), { padding: [50, 50] });
-    console.log(`✓ Karte angepasst für ${allLayers.length} Layer`);
   }
 }
 
-// Hauptfunktion zum Laden aller Rapid Mapping Daten
 function loadRapidMappingData(map, allLayers) {
   // ============================================
   // UNTERSUCHUNGSGEBIET MIT DOPPELTER KONTUR
@@ -292,6 +398,17 @@ function loadRapidMappingData(map, allLayers) {
     allLayers,
     layerGroups.buildings
   );
+  
+  // Straßen und Transportinfrastruktur
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_transportationL_r1_v3.json',
+    null,
+    'Straßen & Transport',
+    'Transportation Infrastructure',
+    map,
+    allLayers,
+    layerGroups.transportation
+  );
 }
 
 // Erweiterte Layer Control mit Hierarchie erstellen
@@ -301,29 +418,17 @@ function createCustomLayerControl(map) {
     <div class="legend-main-header">
       <strong>CEMS RAPID MAPPING EMSR517 - AOI15 Einschätzung der Flutkatastrophe im Ahrtal</strong>
     </div>
-    <div class="legend-date-section">
-      <div class="legend-date-header" data-section="19_07">
-        <span class="section-toggle-icon">▶</span>
-        <div class="date-header-content">
-          <strong>Ortssituation am 18/07/2021, 10:50 Uhr</strong>
-          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
-          <small style="display:block;">Kartierung: 19/07/2021</small>
-        </div>
-        <input type="checkbox" class="section-layer-toggle" data-section="19_07" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
-      </div>
-      <div class="legend-date-content" data-section-content="19_07" style="display: none;"></div>
-    </div>
+    
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="11_08">
-        <span class="section-toggle-icon">▶</span>
+        <span class="section-toggle-icon">▼</span>
         <div class="date-header-content">
-          <strong>Ortssituation am 20/07/2021, 10:35 Uhr</strong>
-          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
-          <small style="display:block;">Kartierung: 11/08/2021</small>
+          <strong>11. August 2021</strong>
+          <small>Monitoring 01 - Gebäude & Infrastruktur</small>
         </div>
-        <input type="checkbox" class="section-layer-toggle" data-section="11_08" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
+        <input type="checkbox" class="section-layer-toggle" data-section="11_08">
       </div>
-      <div class="legend-date-content" data-section-content="11_08" style="display: none;">
+      <div class="legend-date-content" data-section-content="11_08">
         <div class="legend-section-compact">
           <label class="legend-item-compact">
             <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
@@ -369,17 +474,53 @@ function createCustomLayerControl(map) {
             <label class="legend-item-compact">
               <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Mögl. beschädigt</span>
-              <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
+              <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Beschädigt</span>
-              <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
+              <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Zerstört</span>
-              <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
+              <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
+            </label>
+          </div>
+        </div>
+        <div class="legend-section-compact">
+          <div class="legend-category-compact">
+            <span class="toggle-icon-small">▼</span>
+            <label style="flex:1;">
+              <input type="checkbox" class="category-toggle" data-category="transportation" data-date="11_08" checked>
+              <strong>Straßen & Transport</strong>
+            </label>
+          </div>
+          <div class="legend-subcategory-compact" data-category="transportation">
+            <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="transportation" data-date="11_08" checked>
+              <span class="layer-name">Mögl. beschädigt</span>
+              <span class="legend-symbol-small" style="background: #ffb554; border: none; height: 3px;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="transportation" data-date="11_08" checked>
+              <span class="layer-name">Beschädigt</span>
+              <span class="legend-symbol-small" style="background: #ac3d3d; border: none; height: 3px;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="transportation" data-date="11_08" checked>
+              <span class="layer-name">Zerstört</span>
+              <span class="legend-symbol-small" style="background: #3d0707; border: none; height: 3px;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="No visible damage" data-group="transportation" data-date="11_08" checked>
+              <span class="layer-name">Kein sichtb. Schaden</span>
+              <span class="legend-symbol-small" style="background: #999999; border: none; height: 2px;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="subtype-toggle" data-type="Not Analysed" data-group="transportation" data-date="11_08" checked>
+              <span class="layer-name">Nicht analysiert</span>
+              <span class="legend-symbol-small" style="background: repeating-linear-gradient(90deg, #cccccc 0px, #cccccc 5px, transparent 5px, transparent 10px); border: none; height: 2px;"></span>
             </label>
           </div>
         </div>
@@ -474,6 +615,12 @@ function createCustomLayerControl(map) {
         } else {
           map.removeLayer(layerGroups.facilities);
         }
+      } else if (category === 'transportation') {
+        if (this.checked) {
+          map.addLayer(layerGroups.transportation);
+        } else {
+          map.removeLayer(layerGroups.transportation);
+        }
       } else if (category === 'flood') {
         var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
@@ -491,13 +638,13 @@ function createCustomLayerControl(map) {
     });
   });
 
-  // Subtype-Toggles für Gebäudeschäden/Infrastruktur
+  // Subtype-Toggles für Gebäudeschäden/Infrastruktur/Transportation
   controlDiv.querySelectorAll('.subtype-toggle[data-date="11_08"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function(e) {
       var type = this.getAttribute('data-type');
       var group = this.getAttribute('data-group');
       var checked = this.checked;
-      // Filtere alle Marker/Polygone im jeweiligen LayerGroup nach Schadensgrad
+      // Filtere alle Marker/Polygone/Polylines im jeweiligen LayerGroup nach Schadensgrad
       layerGroups[group].eachLayer(function(layer) {
         if (
           layer.feature &&
@@ -579,6 +726,7 @@ function showLayerGroupHierarchy(map) {
   map.addLayer(layerGroups.floodedArea);
   map.addLayer(layerGroups.floodTrace);
   map.addLayer(layerGroups.facilities);
+  map.addLayer(layerGroups.transportation);
   map.addLayer(layerGroups.buildings);
 }
 
@@ -593,6 +741,7 @@ function addLayerWithHierarchy(map) {
   if (map.hasLayer(layerGroups.floodedArea)) map.addLayer(layerGroups.floodedArea);
   if (map.hasLayer(layerGroups.floodTrace)) map.addLayer(layerGroups.floodTrace);
   if (map.hasLayer(layerGroups.facilities)) map.addLayer(layerGroups.facilities);
+  if (map.hasLayer(layerGroups.transportation)) map.addLayer(layerGroups.transportation);
   if (map.hasLayer(layerGroups.buildings)) map.addLayer(layerGroups.buildings);
 }
 
