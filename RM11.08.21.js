@@ -14,27 +14,27 @@ var layerGroups = {
 };
 
 function getFacilityStyle(damageGrade) {
-  // Für Facilities (Polygone) andere Farben als für Gebäude (Punkte)
+  // Einheitliche Farbcodierung für Facilities (Polygone) wie bei Gebäuden
   switch(damageGrade) {
     case 'Destroyed':
       return {
-        color: '#8B0000',
-        fillColor: '#8B0000',
-        fillOpacity: 0.4,
+        color: '#3d0707',
+        fillColor: '#3d070758',
+        fillOpacity: 0.6,
         weight: 2
       };
     case 'Damaged':
       return {
-        color: '#FF6347',
-        fillColor: '#FF6347',
-        fillOpacity: 0.4,
+        color: '#ac3d3d',
+        fillColor: '#ac3d3d62',
+        fillOpacity: 0.6,
         weight: 2
       };
     case 'Possibly damaged':
       return {
-        color: '#FFA500',
-        fillColor: '#FFA500',
-        fillOpacity: 0.3,
+        color: '#ffb554',
+        fillColor: '#ffb55459',
+        fillOpacity: 0.5,
         weight: 2
       };
     default:
@@ -116,7 +116,7 @@ function getTransportationStyle(damageGrade) {
         color: '#cccccc',
         weight: 2,
         opacity: 0.5,
-        dashArray: '5, 5'  // Gestrichelt
+        dashArray: '5, 5'
       };
     default:
       return {
@@ -251,16 +251,13 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             var coords = feature.geometry.coordinates;
             var leafletCoords;
             
-            // MultiLineString vs LineString
             if (geomType === 'MultiLineString') {
-              // MultiLineString: Array von LineStrings
               leafletCoords = coords.map(function(lineString) {
                 return lineString.map(function(coord) {
                   return [coord[1], coord[0]];
                 });
               });
             } else {
-              // Einzelner LineString
               leafletCoords = [coords.map(function(coord) {
                 return [coord[1], coord[0]];
               })];
@@ -269,11 +266,9 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             var damageGrade = feature.properties ? feature.properties.damage_gra : null;
             var lineStyle = getTransportationStyle(damageGrade);
             
-            // Erstelle Polyline(s)
             leafletCoords.forEach(function(lineCoords) {
               var polyline = L.polyline(lineCoords, lineStyle);
               
-              // Zu entsprechender Gruppe hinzufügen
               if (targetGroup) {
                 polyline.addTo(targetGroup);
               } else {
