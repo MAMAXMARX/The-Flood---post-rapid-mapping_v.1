@@ -122,10 +122,10 @@ function loadUESGDataFromFile(map, allLayers) {
       var uesgLayer = L.geoJSON(featureCollection, {
         style: function(feature) {
           return {
-            color: '#0066cc',
-            weight: 2,
-            opacity: 0.8,
-            fillColor: '#0099ff',
+            color: '#00ffb3ff',
+            weight: 1,
+            opacity: 0.5,
+            fillColor: '#00ffb37b',
             fillOpacity: 0.3,
             dashArray: '5, 5'
           };

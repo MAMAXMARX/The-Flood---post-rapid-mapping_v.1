@@ -65,8 +65,8 @@ function getFloodStyle(notation) {
     return {
       color: '#1b00ccff',
       fillColor: '#056bd2ff',
-      fillOpacity: 0.5,
-      weight: 2
+      fillOpacity: 0.3,
+      weight: 1
     };
   } else if (notation === 'Flood trace') {
     return {
