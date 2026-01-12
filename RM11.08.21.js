@@ -14,27 +14,27 @@ var layerGroups = {
 };
 
 function getFacilityStyle(damageGrade) {
-  // EINHEITLICHE Farbcodierung für Facilities (Polygone) wie bei Gebäuden (Punkte)
+  // Für Facilities (Polygone) andere Farben als für Gebäude (Punkte)
   switch(damageGrade) {
     case 'Destroyed':
       return {
-        color: '#3d0707',
-        fillColor: '#3d070758',
-        fillOpacity: 0.6,
+        color: '#8B0000',
+        fillColor: '#8B0000',
+        fillOpacity: 0.4,
         weight: 2
       };
     case 'Damaged':
       return {
-        color: '#ac3d3d',
-        fillColor: '#ac3d3d62',
-        fillOpacity: 0.6,
+        color: '#FF6347',
+        fillColor: '#FF6347',
+        fillOpacity: 0.4,
         weight: 2
       };
     case 'Possibly damaged':
       return {
-        color: '#ffb554',
-        fillColor: '#ffb55459',
-        fillOpacity: 0.5,
+        color: '#FFA500',
+        fillColor: '#FFA500',
+        fillOpacity: 0.3,
         weight: 2
       };
     default:
@@ -65,8 +65,8 @@ function getFloodStyle(notation) {
     return {
       color: '#1b00ccff',
       fillColor: '#056bd2ff',
-      fillOpacity: 0.3,
-      weight: 1
+      fillOpacity: 0.5,
+      weight: 2
     };
   } else if (notation === 'Flood trace') {
     return {
@@ -79,7 +79,7 @@ function getFloodStyle(notation) {
   // Fallback für andere Notationen
   return {
     color: '#9af3ff85',
-    fillOpacity: 0.3,
+    fillOpacity: 0.5,
     weight: 1
   };
 }
@@ -326,9 +326,11 @@ function updateMapView(map, allLayers) {
   if (allLayers.length > 0) {
     var group = L.featureGroup(allLayers);
     map.fitBounds(group.getBounds(), { padding: [50, 50] });
+    console.log(`✓ Karte angepasst für ${allLayers.length} Layer`);
   }
 }
 
+// Hauptfunktion zum Laden aller Rapid Mapping Daten
 function loadRapidMappingData(map, allLayers) {
   // ============================================
   // UNTERSUCHUNGSGEBIET MIT DOPPELTER KONTUR
@@ -418,17 +420,29 @@ function createCustomLayerControl(map) {
     <div class="legend-main-header">
       <strong>CEMS RAPID MAPPING EMSR517 - AOI15 Einschätzung der Flutkatastrophe im Ahrtal</strong>
     </div>
-    
+    <div class="legend-date-section">
+      <div class="legend-date-header" data-section="19_07">
+        <span class="section-toggle-icon">▶</span>
+        <div class="date-header-content">
+          <strong>Ortssituation am 18/07/2021, 10:50 Uhr</strong>
+          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
+          <small style="display:block;">Kartierung: 19/07/2021</small>
+        </div>
+        <input type="checkbox" class="section-layer-toggle" data-section="19_07" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
+      </div>
+      <div class="legend-date-content" data-section-content="19_07" style="display: none;"></div>
+    </div>
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="11_08">
-        <span class="section-toggle-icon">▼</span>
+        <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
-          <strong>11. August 2021</strong>
-          <small>Monitoring 01 - Gebäude & Infrastruktur</small>
+          <strong>Ortssituation am 20/07/2021, 10:35 Uhr</strong>
+          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
+          <small style="display:block;">Kartierung: 11/08/2021</small>
         </div>
-        <input type="checkbox" class="section-layer-toggle" data-section="11_08">
+        <input type="checkbox" class="section-layer-toggle" data-section="11_08" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
       </div>
-      <div class="legend-date-content" data-section-content="11_08">
+      <div class="legend-date-content" data-section-content="11_08" style="display: none;">
         <div class="legend-section-compact">
           <label class="legend-item-compact">
             <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
@@ -474,17 +488,17 @@ function createCustomLayerControl(map) {
             <label class="legend-item-compact">
               <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Mögl. beschädigt</span>
-              <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
+              <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Beschädigt</span>
-              <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
+              <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="facilities" data-date="11_08" checked>
               <span class="layer-name">Zerstört</span>
-              <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
+              <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
             </label>
           </div>
         </div>
@@ -644,7 +658,7 @@ function createCustomLayerControl(map) {
       var type = this.getAttribute('data-type');
       var group = this.getAttribute('data-group');
       var checked = this.checked;
-      // Filtere alle Marker/Polygone/Polylines im jeweiligen LayerGroup nach Schadensgrad
+      // Filtere alle Marker/Polygone im jeweiligen LayerGroup nach Schadensgrad
       layerGroups[group].eachLayer(function(layer) {
         if (
           layer.feature &&
