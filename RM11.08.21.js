@@ -10,7 +10,11 @@ var layerGroups = {
   floodedArea: L.layerGroup(),
   floodTrace: L.layerGroup(),
   facilities: L.layerGroup(),
-  transportation: L.layerGroup()
+  transportation: L.layerGroup(),
+  notAnalysed: L.layerGroup(),
+  rivers: L.layerGroup(),
+  lakes: L.layerGroup(),
+  vegetation: L.layerGroup()
 };
 
 function getFacilityStyle(damageGrade) {
@@ -65,8 +69,8 @@ function getFloodStyle(notation) {
     return {
       color: '#1b00ccff',
       fillColor: '#056bd2ff',
-      fillOpacity: 0.3,
-      weight: 1
+      fillOpacity: 0.5,
+      weight: 2
     };
   } else if (notation === 'Flood trace') {
     return {
@@ -406,6 +410,70 @@ function loadRapidMappingData(map, allLayers) {
     allLayers,
     layerGroups.transportation
   );
+  
+  // Nicht analysierte Bereiche (Wolkenbedeckung)
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_imageFootprintA_r1_v3.json',
+    {
+      color: '#666666',
+      fillColor: '#eeeeee',
+      fillOpacity: 0.5,
+      weight: 1,
+      dashArray: '5, 5'
+    },
+    'Nicht analysierte Bereiche',
+    'Image Footprint - Not Analysed',
+    map,
+    allLayers,
+    layerGroups.notAnalysed
+  );
+  
+  // Flüsse und Bäche
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyL_r1_v3.json',
+    {
+      color: '#0066cc',
+      weight: 2,
+      opacity: 0.7
+    },
+    'Flüsse & Bäche',
+    'Hydrography Lines',
+    map,
+    allLayers,
+    layerGroups.rivers
+  );
+  
+  // Seen und Teiche
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyA_r1_v3.json',
+    {
+      color: '#0066cc',
+      fillColor: '#6699cc',
+      fillOpacity: 0.4,
+      weight: 1
+    },
+    'Seen & Teiche',
+    'Hydrography Areas',
+    map,
+    allLayers,
+    layerGroups.lakes
+  );
+  
+  // Vegetation und Wälder
+  loadGeoJSON(
+    './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_naturalLandUseA_r1_v3.json',
+    {
+      color: '#228B22',
+      fillColor: '#90EE90',
+      fillOpacity: 0.3,
+      weight: 1
+    },
+    'Vegetation & Wälder',
+    'Natural Land Use',
+    map,
+    allLayers,
+    layerGroups.vegetation
+  );
 }
 
 // Erweiterte Layer Control mit Hierarchie erstellen
@@ -554,6 +622,37 @@ function createCustomLayerControl(map) {
             </label>
           </div>
         </div>
+        <div class="legend-section-compact">
+          <div class="legend-category-compact">
+            <span class="toggle-icon-small">▼</span>
+            <label style="flex:1;">
+              <input type="checkbox" class="category-toggle" data-category="context" data-date="11_08">
+              <strong>Kontext & Hintergrund</strong>
+            </label>
+          </div>
+          <div class="legend-subcategory-compact" data-category="context">
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="notAnalysed" data-date="11_08" checked>
+              <span class="layer-name">Nicht analysiert (Wolken)</span>
+              <span class="legend-symbol-small" style="background: #eeeeee; border: 1px dashed #666666;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="rivers" data-date="11_08">
+              <span class="layer-name">Flüsse & Bäche</span>
+              <span class="legend-symbol-small" style="background: #0066cc; border: none; height: 2px;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="lakes" data-date="11_08">
+              <span class="layer-name">Seen & Teiche</span>
+              <span class="legend-symbol-small" style="background: #6699cc; border: 1px solid #0066cc;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="vegetation" data-date="11_08">
+              <span class="layer-name">Vegetation & Wälder</span>
+              <span class="legend-symbol-small" style="background: #90EE90; border: 1px solid #228B22;"></span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -631,6 +730,17 @@ function createCustomLayerControl(map) {
           map.removeLayer(layerGroups.transportation);
         }
       } else if (category === 'flood') {
+        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
+        subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
+          if (this.checked) {
+            subCheckbox.checked = true;
+            subCheckbox.dispatchEvent(new Event('change'));
+          } else {
+            subCheckbox.checked = false;
+            subCheckbox.dispatchEvent(new Event('change'));
+          }
+        }.bind(this));
+      } else if (category === 'context') {
         var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
           if (this.checked) {
@@ -731,9 +841,13 @@ function showLayerGroupHierarchy(map) {
     map.removeLayer(group);
   });
   // Füge in gewünschter Reihenfolge hinzu
+  map.addLayer(layerGroups.lakes);
+  map.addLayer(layerGroups.rivers);
+  map.addLayer(layerGroups.vegetation);
   map.addLayer(layerGroups.aoi);
   map.addLayer(layerGroups.floodedArea);
   map.addLayer(layerGroups.floodTrace);
+  map.addLayer(layerGroups.notAnalysed);
   map.addLayer(layerGroups.facilities);
   map.addLayer(layerGroups.transportation);
   map.addLayer(layerGroups.buildings);
@@ -746,9 +860,13 @@ function addLayerWithHierarchy(map) {
     map.removeLayer(group);
   });
   // Füge in gewünschter Reihenfolge hinzu, falls aktiv
+  if (map.hasLayer(layerGroups.lakes)) map.addLayer(layerGroups.lakes);
+  if (map.hasLayer(layerGroups.rivers)) map.addLayer(layerGroups.rivers);
+  if (map.hasLayer(layerGroups.vegetation)) map.addLayer(layerGroups.vegetation);
   if (map.hasLayer(layerGroups.aoi)) map.addLayer(layerGroups.aoi);
   if (map.hasLayer(layerGroups.floodedArea)) map.addLayer(layerGroups.floodedArea);
   if (map.hasLayer(layerGroups.floodTrace)) map.addLayer(layerGroups.floodTrace);
+  if (map.hasLayer(layerGroups.notAnalysed)) map.addLayer(layerGroups.notAnalysed);
   if (map.hasLayer(layerGroups.facilities)) map.addLayer(layerGroups.facilities);
   if (map.hasLayer(layerGroups.transportation)) map.addLayer(layerGroups.transportation);
   if (map.hasLayer(layerGroups.buildings)) map.addLayer(layerGroups.buildings);
