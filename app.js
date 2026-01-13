@@ -1,179 +1,208 @@
-document.addEventListener('DOMContentLoaded', function () {
-  
-  var map = L.map('map').setView([50.450453753490834, 6.888650882405452], 13);
+// ============================================
+// AHRTAL FLUTKATASTROPHE - ZUSAETZLICHE LAYER
+// Ueberschwemmungsgebiet (Hochwasserlinie)
+// ============================================
 
-  // ============================================
-  // VERSCHIEDENE KARTENANSICHTEN (BASE LAYERS)
-  // ============================================
-  
-  // OpenStreetMap (Standard)
-  var osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19
-  });
+/**
+ * Laedt zusaetzliche Kartenlayer fuer die Ahrtal-Flutkatastrophe:
+ * - Ueberschwemmungsgebiet (UESG) Ahr
+ * 
+ * Datenquellen:
+ * - Geoportal RLP / SGD Nord
+ */
 
-  // OpenStreetMap Humanitarian (bessere Sichtbarkeit bei Katastrophen)
-  var osmHumanitarian = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by Humanitarian OpenStreetMap Team',
-    maxZoom: 19
-  });
-
-  // Esri World Imagery (Satellit - aktuellste verfügbare Aufnahmen)
-  var esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-    maxZoom: 18
-  });
-
-  // Google Satellite (Alternative)
-  var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-    maxZoom: 20,
-    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-    attribution: '&copy; Google'
-  });
-
-  // CartoDB Voyager (schöne Übersichtskarte)
-  var cartoVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19
-  });
-
-  // Standard-Karte beim Start anzeigen
-  osmStandard.addTo(map);
-
-  // Array für alle Layer
-  var allLayers = [];
-
-  // ============================================
-  // BASE LAYER CONTROL (Kartenauswahl)
-  // ============================================
-  
-  var baseMaps = {
-    "OpenStreetMap": osmStandard,
-    "Humanitarian": osmHumanitarian,
-    "Satellit (Esri)": esriSatellite,
-    "Google Satellit": googleSatellite,
-    "CartoDB Voyager": cartoVoyager
-  };
-
-  // Standard Layer Control für Basiskarten hinzufügen (unten links)
-  var layerControl = L.control.layers(baseMaps, {}, {
-    position: 'bottomleft',
-    collapsed: false
-  }).addTo(map);
-  
-  // Speichere Layer Control global für Ahrtal-Layer
-  window.globalLayerControl = layerControl;
+function loadAhrtalLayers(map, allLayers) {
+  console.log('[Ahrtal] Lade Hochwasserlinie...');
   
   // ============================================
-  // MONOCHROME FILTER IN LAYER CONTROL EINFÜGEN
+  // UEBERSCHWEMMUNGSGEBIET (UESG) AHR
   // ============================================
   
-  // Warte bis Layer Control im DOM ist
+  // Speichere Map-Referenz global fuer spaetere Verwendung
+  window.ahrtalMap = map;
+  
+  // Lade UESG-Daten aus lokaler JSON-Datei
+  loadUESGDataFromFile(map, allLayers);
+  
+  console.log('[Ahrtal] Ahrtal-Layer erfolgreich initialisiert');
+}
+
+// ============================================
+// UESG-DATEN AUS LOKALER JSON-DATEI LADEN
+// ============================================
+
+function loadUESGDataFromFile(map, allLayers) {
+  console.log('[UESG] Lade Ueberschwemmungsgebiet-Daten aus lokaler Datei...');
+  
+  // Lade lokale JSON-Datei
+  fetch('uesg_ahr.json')
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error('UESG JSON-Datei nicht gefunden: ' + response.status);
+      }
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('[UESG] Daten erfolgreich geladen:', data);
+      
+      // Die Datei enthaelt ein einzelnes Feature, konvertiere zu FeatureCollection
+      var featureCollection = {
+        type: 'FeatureCollection',
+        features: [data]
+      };
+      
+      // Erstelle GeoJSON Layer
+      var uesgLayer = L.geoJSON(featureCollection, {
+        style: function(feature) {
+          return {
+            color: '#00ffb3ff',
+            weight: 1,
+            opacity: 0.5,
+            fillColor: '#00ffb37b',
+            fillOpacity: 0.3,
+            dashArray: '5, 5'
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          var props = feature.properties || {};
+          var popupContent = '<div style="font-family: Arial; font-size: 12px;">';
+          popupContent += '<strong>Ueberschwemmungsgebiet Ahr</strong><br>';
+          popupContent += '<em>' + (props.STAND_BEZ || 'Vorlaeufig sichergestellt') + '</em><br><br>';
+          
+          if (props.GEW_NAME) {
+            popupContent += '<strong>Gewaesser:</strong> ' + props.GEW_NAME + '<br>';
+          }
+          if (props.HQ) {
+            popupContent += '<strong>Bemessungshochwasser:</strong> HQ ' + props.HQ + '<br>';
+          }
+          if (props.RVO_DATUM) {
+            popupContent += '<strong>Datum:</strong> ' + props.RVO_DATUM + '<br>';
+          }
+          if (props.STRECKE) {
+            popupContent += '<strong>Strecke:</strong> ' + props.STRECKE + '<br>';
+          }
+          
+          popupContent += '<br><small>Datenquelle: <a href="https://sgdnord.rlp.de" target="_blank">SGD Nord RLP</a></small>';
+          popupContent += '</div>';
+          
+          layer.bindPopup(popupContent);
+        }
+      });
+      
+      // Speichere Layer global
+      window.uesgAhrLayer = uesgLayer;
+      allLayers.push(uesgLayer);
+      
+      // Fuege zur Legende hinzu
+      addUESGToLegend(map);
+      
+      console.log('[UESG] Layer erfolgreich erstellt und zur Legende hinzugefuegt');
+    })
+    .catch(function(error) {
+      console.error('[UESG] Fehler beim Laden der lokalen Datei:', error);
+      console.log('[UESG] Stelle sicher, dass uesg_ahr.json im gleichen Verzeichnis wie index.html liegt');
+    });
+}
+
+// ============================================
+// UESG-LAYER ZUR RECHTEN LEGENDE HINZUFUEGEN
+// ============================================
+
+function addUESGToLegend(map) {
   setTimeout(function() {
-    var layerControlContainer = document.querySelector('.leaflet-control-layers-base');
-    if (layerControlContainer) {
-      // Erstelle Separator
-      var separator = document.createElement('div');
-      separator.className = 'leaflet-control-layers-separator';
-      
-      // Erstelle Monochrome Filter Option
-      var filterDiv = document.createElement('label');
-      filterDiv.style.display = 'flex';
-      filterDiv.style.alignItems = 'center';
-      filterDiv.style.gap = '6px';
-      filterDiv.style.padding = '4px 0';
-      filterDiv.style.cursor = 'pointer';
-      filterDiv.style.fontSize = '12px';
-      filterDiv.style.marginTop = '8px';
-      
-      var checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = 'monochromeToggle';
-      checkbox.style.cursor = 'pointer';
-      checkbox.style.width = '14px';
-      checkbox.style.height = '14px';
-      checkbox.style.margin = '0';
-      
-      var label = document.createElement('span');
-      label.textContent = 'Monochrome Filter';
-      label.style.fontWeight = '500';
-      
-      filterDiv.appendChild(checkbox);
-      filterDiv.appendChild(label);
-      
-      // Füge nach der Base-Layer-Sektion ein
-      layerControlContainer.parentNode.insertBefore(separator, layerControlContainer.nextSibling);
-      layerControlContainer.parentNode.insertBefore(filterDiv, separator.nextSibling);
-      
-      // Event Listener für Monochrome Toggle
-      var mapElement = document.getElementById('map');
-      checkbox.addEventListener('change', function() {
-        if (this.checked) {
-          mapElement.classList.add('monochrome');
-          console.log('✓ Monochrome Filter aktiviert');
+    var legendControl = document.querySelector('.custom-layer-control');
+    if (!legendControl) {
+      console.warn('[UESG] Keine Legende gefunden');
+      return;
+    }
+    
+    // Erstelle neue Sektion fuer Ueberschwemmungsgebiet
+    var uesgSection = document.createElement('div');
+    uesgSection.className = 'legend-date-section';
+    uesgSection.innerHTML = `
+      <div class="legend-date-header" style="background: #e3f2fd;">
+        <span class="section-toggle-icon" id="uesg-toggle">▼</span>
+        <div class="date-header-content">
+          <strong style="color: #0066cc;">Ueberschwemmungsgebiet Ahr</strong>
+          <small style="color: #0066cc;">Vorlaeufig sichergestellt (Par.76 Abs. 3 WHG)</small>
+        </div>
+      </div>
+      <div class="legend-date-content" id="uesg-content">
+        <div class="legend-item-compact">
+          <input type="checkbox" id="uesg-toggle-checkbox">
+          <label for="uesg-toggle-checkbox" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <span class="legend-symbol-small" style="background: linear-gradient(135deg, #0099ff 0%, #0066cc 100%); border: 2px solid #0066cc;"></span>
+            <span class="layer-name">Hochwasserlinie 2021</span>
+          </label>
+        </div>
+        <div style="margin-top: 8px; padding: 6px; background: #f5f5f5; border-radius: 4px; font-size: 10px; color: #555;">
+          <strong>Hinweis:</strong><br>
+          Zeigt die vorlaeufig sichergestellte Ueberschwemmungsflaeche der Ahrtal-Flut vom Juli 2021.<br><br>
+          <strong>Datenquelle:</strong> <a href="https://sgdnord.rlp.de" target="_blank" style="color: #0066cc;">SGD Nord RLP</a> / 
+          <a href="https://www.geoportal.rlp.de" target="_blank" style="color: #0066cc;">Geoportal RLP</a>
+        </div>
+      </div>
+    `;
+    
+    // Fuege die Sektion am Anfang der Legende ein
+    var firstSection = legendControl.querySelector('.legend-date-section');
+    if (firstSection) {
+      legendControl.insertBefore(uesgSection, firstSection);
+    } else {
+      legendControl.appendChild(uesgSection);
+    }
+    
+    // Event Listener fuer Toggle-Icon
+    var headerElement = uesgSection.querySelector('.legend-date-header');
+    var toggleIcon = document.getElementById('uesg-toggle');
+    var toggleContent = document.getElementById('uesg-content');
+    
+    if (headerElement && toggleIcon && toggleContent) {
+      headerElement.addEventListener('click', function() {
+        if (toggleContent.style.display === 'none') {
+          toggleContent.style.display = 'block';
+          toggleIcon.textContent = '▼';
         } else {
-          mapElement.classList.remove('monochrome');
-          console.log('✓ Monochrome Filter deaktiviert');
+          toggleContent.style.display = 'none';
+          toggleIcon.textContent = '▶';
         }
       });
     }
-  }, 100);
-
-  // ============================================
-  // RAPID MAPPING DATEN LADEN
-  // ============================================
-  
-  // Custom Layer Control erstellen (muss ZUERST erfolgen)
-  createCustomLayerControl(map);
-  
-  // Funktion aus RM11.08.21.js aufrufen
-  loadRapidMappingData(map, allLayers);
-  
-  // Funktion aus RM19.07.21.js aufrufen
-  loadRapidMappingData_19_07(map, allLayers);
-  
-  // 19.07 Daten zur Legende hinzufügen
-  setTimeout(function() {
-    var legendControl = document.querySelector('.custom-layer-control');
-    if (legendControl) {
-      addLayerControl_19_07_ToExisting(legendControl, map);
+    
+    // Event Listener fuer Checkbox
+    var checkbox = document.getElementById('uesg-toggle-checkbox');
+    if (checkbox) {
+      checkbox.addEventListener('change', function() {
+        var layer = window.uesgAhrLayer;
+        var mapRef = window.ahrtalMap;
+        
+        if (!layer) {
+          console.warn('[UESG] Layer noch nicht geladen');
+          this.checked = false;
+          return;
+        }
+        
+        if (!mapRef) {
+          console.warn('[UESG] Map-Referenz nicht gefunden');
+          this.checked = false;
+          return;
+        }
+        
+        if (this.checked) {
+          mapRef.addLayer(layer);
+          console.log('[UESG] Layer eingeblendet');
+        } else {
+          mapRef.removeLayer(layer);
+          console.log('[UESG] Layer ausgeblendet');
+        }
+      });
     }
-  }, 300);
-  
-  // ============================================
-  // NEU: AHRTAL LAYER LADEN (Luftbilder & ÜSG)
-  // ============================================
-  
-  // Lade Ahrtal-Layer aus Layer.js
-  if (typeof loadAhrtalLayers === 'function') {
-    setTimeout(function() {
-      loadAhrtalLayers(map, allLayers);
-      console.log('✅ Ahrtal-Layer (Luftbilder 2019/2021 & Hochwasserlinie) werden geladen...');
-    }, 500);
-  } else {
-    console.warn('⚠️ loadAhrtalLayers Funktion nicht gefunden - Layer.js geladen?');
-  }
+    
+    console.log('[UESG] Legende erfolgreich erstellt');
+  }, 800);
+}
 
-  // Karte nach kurzer Verzögerung neu rendern
-  setTimeout(function() { 
-    map.invalidateSize(); 
-  }, 100);
-  
-  // ============================================
-  // HOCHAUFLÖSENDER KARTEN-EXPORT
-  // ============================================
-  
-  L.easyPrint({
-    title: 'Karte als PNG exportieren',
-    position: 'topleft',
-    sizeModes: ['Current', 'A4Landscape', 'A4Portrait'],
-    filename: 'EMSR517_AOI15_Schuld_Flutkatastrophe',
-    exportOnly: true,
-    hideControlContainer: true,
-    hideClasses: ['leaflet-control-layers', 'custom-layer-control'],
-    customWindowTitle: 'EMSR517 AOI15 - Schuld Flutkatastrophe Export'
-  }).addTo(map);
-  
-  console.log('✓ Karte geladen - Monochrome Filter & Export verfügbar');
-  console.log(' Ahrtal-Layer-Integration aktiviert');
-});
+// Exportiere die Hauptfunktion
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { loadAhrtalLayers };
+}
