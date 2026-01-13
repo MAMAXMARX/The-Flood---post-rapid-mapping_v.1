@@ -37,6 +37,22 @@ document.addEventListener('DOMContentLoaded', function () {
     maxZoom: 19
   });
 
+  // ============================================
+  // NEU: DOP40 SONDERBEFLIEGUNG HOCHWASSER 2021
+  // ============================================
+  
+  // WMTS-Dienst von Geoportal RLP (umgeht CORB-Problem)
+  var dop40Hochwasser = L.tileLayer(
+    'https://www.geoportal.rlp.de/spatial-objects/935/tiles/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; <a href="https://www.geoportal.rlp.de" target="_blank">Geoportal RLP</a> - DOP40 Sonderbefliegung Hochwasser Juli 2021',
+      maxZoom: 20,
+      minZoom: 10,
+      tileSize: 256,
+      crossOrigin: true
+    }
+  );
+
   // Standard-Karte beim Start anzeigen
   osmStandard.addTo(map);
 
@@ -52,7 +68,8 @@ document.addEventListener('DOMContentLoaded', function () {
     "Humanitarian": osmHumanitarian,
     "Satellit (Esri)": esriSatellite,
     "Google Satellit": googleSatellite,
-    "CartoDB Voyager": cartoVoyager
+    "CartoDB Voyager": cartoVoyager,
+    "Sonderbefliegung Juli 2021": dop40Hochwasser
   };
 
   // Standard Layer Control für Basiskarten hinzufügen (unten links)
@@ -141,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }, 300);
   
   // ============================================
-  // NEU: AHRTAL LAYER LADEN (Luftbilder & ÜSG)
+  // NEU: AHRTAL LAYER LADEN (Hochwasserlinie)
   // ============================================
   
   // Lade Ahrtal-Layer aus Layer.js
@@ -176,4 +193,5 @@ document.addEventListener('DOMContentLoaded', function () {
   
   console.log('✓ Karte geladen - Monochrome Filter & Export verfügbar');
   console.log('🌊 Ahrtal-Layer-Integration aktiviert');
+  console.log('📸 DOP40 Sonderbefliegung als Base Layer verfügbar');
 });

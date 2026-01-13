@@ -1,20 +1,19 @@
 // ============================================
-// AHRTAL FLUTKATASTROPHE - ZUSAETZLICHE LAYER
-// Ueberschwemmungsgebiet (Hochwasserlinie)
-// DOP40 Sonderbefliegung Hochwasser (WMS)
+// AHRTAL FLUTKATASTROPHE
 // ============================================
 
 /**
  * Laedt zusaetzliche Kartenlayer fuer die Ahrtal-Flutkatastrophe:
  * - Ueberschwemmungsgebiet (UESG) Ahr
- * - DOP40 Sonderbefliegung Hochwasser 2021 (WMS)
  * 
  * Datenquellen:
  * - Geoportal RLP / SGD Nord
+ * 
+ * HINWEIS: DOP40 Luftbilder werden jetzt als Base Layer in app.js geladen
  */
 
 function loadAhrtalLayers(map, allLayers) {
-  console.log('[Ahrtal] Lade Hochwasserlinie und Luftbilder...');
+  console.log('[Ahrtal] Lade Hochwasserlinie...');
   
   // ============================================
   // UEBERSCHWEMMUNGSGEBIET (UESG) AHR
@@ -26,175 +25,7 @@ function loadAhrtalLayers(map, allLayers) {
   // Lade UESG-Daten aus lokaler JSON-Datei
   loadUESGDataFromFile(map, allLayers);
   
-  // ============================================
-  // DOP40 HOCHWASSER-LUFTBILDER (WMS)
-  // ============================================
-  
-  // Lade DOP40 Sonderbefliegung als WMS-Layer
-  loadDOP40WMSLayer(map, allLayers);
-  
   console.log('[Ahrtal] Ahrtal-Layer erfolgreich initialisiert');
-}
-
-// ============================================
-// DOP40 WMS-LAYER LADEN
-// ============================================
-
-function loadDOP40WMSLayer(map, allLayers) {
-  console.log('[DOP40] Lade WMS-Layer fuer Hochwasser-Luftbilder...');
-  
-  // WMS-Layer von Geoportal RLP
-  var dop40WMS = L.tileLayer.wms('https://www.geoportal.rlp.de/mapbender/php/wms.php', {
-    layers: 'rp_dop40_sonderbefliegung_hochwasser',
-    format: 'image/png',
-    transparent: true,
-    version: '1.3.0',
-    crs: L.CRS.EPSG3857,
-    attribution: '&copy; <a href="https://www.geoportal.rlp.de" target="_blank">Geoportal RLP</a> - DOP40 Sonderbefliegung Hochwasser 2021',
-    maxZoom: 22,
-    opacity: 0.85
-  });
-  
-  // Speichere Layer global
-  window.dop40WMSLayer = dop40WMS;
-  allLayers.push(dop40WMS);
-  
-  // Fuege zur Legende hinzu
-  addDOP40ToLegend(map);
-  
-  console.log('[DOP40] WMS-Layer erfolgreich erstellt');
-}
-
-// ============================================
-// DOP40-LAYER ZUR RECHTEN LEGENDE HINZUFUEGEN
-// ============================================
-
-function addDOP40ToLegend(map) {
-  setTimeout(function() {
-    var legendControl = document.querySelector('.custom-layer-control');
-    if (!legendControl) {
-      console.warn('[DOP40] Keine Legende gefunden');
-      return;
-    }
-    
-    // Erstelle neue Sektion fuer DOP40 Luftbilder
-    var dop40Section = document.createElement('div');
-    dop40Section.className = 'legend-date-section';
-    dop40Section.innerHTML = `
-      <div class="legend-date-header" style="background: #fff3e0;">
-        <span class="section-toggle-icon" id="dop40-toggle">▼</span>
-        <div class="date-header-content">
-          <strong style="color: #e65100;">DOP40 Hochwasser-Luftbilder</strong>
-          <small style="color: #e65100;">Sonderbefliegung Juli 2021 (40cm Auflösung)</small>
-        </div>
-      </div>
-      <div class="legend-date-content" id="dop40-content">
-        <div class="legend-item-compact">
-          <input type="checkbox" id="dop40-toggle-checkbox">
-          <label for="dop40-toggle-checkbox" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-            <span class="legend-symbol-small" style="background: linear-gradient(135deg, #ff9800 0%, #e65100 100%); border: 2px solid #e65100;"></span>
-            <span class="layer-name">Luftbilder Hochwasser 2021</span>
-          </label>
-        </div>
-        
-        <div style="margin-top: 10px; padding: 6px; background: #fff; border: 1px solid #ff9800; border-radius: 4px;">
-          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;">
-            <span style="font-weight: 600; color: #e65100;">Transparenz:</span>
-            <input type="range" id="dop40-opacity-slider" min="0" max="100" value="85" 
-                   style="flex: 1; cursor: pointer;">
-            <span id="dop40-opacity-value" style="min-width: 35px; text-align: right; color: #e65100;">85%</span>
-          </label>
-        </div>
-        
-        <div style="margin-top: 8px; padding: 6px; background: #f5f5f5; border-radius: 4px; font-size: 10px; color: #555;">
-          <strong>Technische Details:</strong><br>
-          • Bodenauflösung: 40 cm<br>
-          • Befliegungszeitraum: Juli 2021<br>
-          • Format: DOP (Digitales Orthophoto)<br>
-          • Koordinatensystem: EPSG:25832<br><br>
-          
-          <strong>Hinweis:</strong><br>
-          Hochauflösende Luftbildaufnahmen direkt nach der Flutkatastrophe. 
-          Die Bilder zeigen das Ausmaß der Zerstörung unmittelbar nach dem Hochwasser.<br><br>
-          
-          <strong>Datenquelle:</strong> <a href="https://www.geoportal.rlp.de" target="_blank" style="color: #e65100;">Geoportal RLP</a>
-        </div>
-      </div>
-    `;
-    
-    // Fuege die Sektion am Anfang der Legende ein (nach UESG)
-    var uesgSection = legendControl.querySelector('.legend-date-section');
-    if (uesgSection && uesgSection.nextSibling) {
-      legendControl.insertBefore(dop40Section, uesgSection.nextSibling);
-    } else {
-      legendControl.appendChild(dop40Section);
-    }
-    
-    // Event Listener fuer Toggle-Icon
-    var headerElement = dop40Section.querySelector('.legend-date-header');
-    var toggleIcon = document.getElementById('dop40-toggle');
-    var toggleContent = document.getElementById('dop40-content');
-    
-    if (headerElement && toggleIcon && toggleContent) {
-      headerElement.addEventListener('click', function() {
-        if (toggleContent.style.display === 'none') {
-          toggleContent.style.display = 'block';
-          toggleIcon.textContent = '▼';
-        } else {
-          toggleContent.style.display = 'none';
-          toggleIcon.textContent = '▶';
-        }
-      });
-    }
-    
-    // Event Listener fuer Checkbox (Layer ein/aus)
-    var checkbox = document.getElementById('dop40-toggle-checkbox');
-    if (checkbox) {
-      checkbox.addEventListener('change', function() {
-        var layer = window.dop40WMSLayer;
-        var mapRef = window.ahrtalMap;
-        
-        if (!layer) {
-          console.warn('[DOP40] Layer noch nicht geladen');
-          this.checked = false;
-          return;
-        }
-        
-        if (!mapRef) {
-          console.warn('[DOP40] Map-Referenz nicht gefunden');
-          this.checked = false;
-          return;
-        }
-        
-        if (this.checked) {
-          mapRef.addLayer(layer);
-          console.log('[DOP40] Layer eingeblendet');
-        } else {
-          mapRef.removeLayer(layer);
-          console.log('[DOP40] Layer ausgeblendet');
-        }
-      });
-    }
-    
-    // Event Listener fuer Transparenz-Slider
-    var opacitySlider = document.getElementById('dop40-opacity-slider');
-    var opacityValue = document.getElementById('dop40-opacity-value');
-    
-    if (opacitySlider && opacityValue) {
-      opacitySlider.addEventListener('input', function() {
-        var opacity = this.value / 100;
-        opacityValue.textContent = this.value + '%';
-        
-        var layer = window.dop40WMSLayer;
-        if (layer && window.ahrtalMap.hasLayer(layer)) {
-          layer.setOpacity(opacity);
-          console.log('[DOP40] Transparenz geändert:', this.value + '%');
-        }
-      });
-    }
-    
-    console.log('[DOP40] Legende erfolgreich erstellt');
-  }, 900);
 }
 
 // ============================================
