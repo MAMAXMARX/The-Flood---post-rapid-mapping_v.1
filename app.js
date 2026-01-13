@@ -175,5 +175,5 @@ document.addEventListener('DOMContentLoaded', function () {
   }).addTo(map);
   
   console.log('✓ Karte geladen - Monochrome Filter & Export verfügbar');
-  console.log('🌊 Ahrtal-Layer-Integration aktiviert');
+  console.log(' Ahrtal-Layer-Integration aktiviert');
 });
