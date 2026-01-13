@@ -1,5 +1,6 @@
 // ============================================
-// AHRTAL FLUTKATASTROPHE
+// AHRTAL FLUTKATASTROPHE - ZUSAETZLICHE LAYER
+// Ueberschwemmungsgebiet (Hochwasserlinie)
 // ============================================
 
 /**
