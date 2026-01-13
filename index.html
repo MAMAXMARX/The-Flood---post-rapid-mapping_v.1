@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rapid Mapping - EMSR517; AOI15</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.css" />
+  
+  <!-- HINWEIS: leaflet-easyprint hat KEIN bundle.css - nur bundle.js! -->
+  <!-- Das CSS ist bereits im JS enthalten -->
+  
   <style>
     /* Set the map container size */
     #map {
@@ -21,6 +24,32 @@
     #map.monochrome .leaflet-tile-pane {
       filter: grayscale(100%) contrast(1.2) brightness(0.95);
       -webkit-filter: grayscale(100%) contrast(1.2) brightness(0.95);
+    }
+    
+    /* ============================================ */
+    /* EASYPRINT BUTTON STYLING */
+    /* ============================================ */
+    .leaflet-control-easyPrint {
+      background-color: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    }
+    
+    .leaflet-control-easyPrint a {
+      background-color: white;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: black;
+      font-size: 18px;
+      border-radius: 4px;
+    }
+    
+    .leaflet-control-easyPrint a:hover {
+      background-color: #f4f4f4;
     }
     
     /* Custom Layer Control Styling */
@@ -278,13 +307,15 @@
   <div id="map"></div>
   
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
+  
+  <!-- leaflet-easyprint - NUR das JS, kein CSS nötig! -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
   
   <!-- Zuerst die Daten-Funktionen laden -->
   <script src="RM11.08.21.js"></script>
   <script src="RM19.07.21.js"></script>
   
-  <!-- NEU: Layer.js für Luftbilder 2019/2021 und Hochwasserlinie -->
+  <!-- Layer.js für Hochwasserlinie -->
   <script src="Layer.js"></script>
   
   <!-- Dann die Hauptanwendung -->
