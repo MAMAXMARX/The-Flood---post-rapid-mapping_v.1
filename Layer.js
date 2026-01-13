@@ -1,18 +1,85 @@
 // ============================================
 // AHRTAL FLUTKATASTROPHE - ZUSAETZLICHE LAYER
-// Ueberschwemmungsgebiet (Hochwasserlinie)
+// Luftbilder 2019/2021 & Ueberschwemmungsgebiet
 // ============================================
 
 /**
  * Laedt zusaetzliche Kartenlayer fuer die Ahrtal-Flutkatastrophe:
+ * - Luftbilder 2019 (vor der Flut)
+ * - Luftbilder 2021 (nach der Flut) 
  * - Ueberschwemmungsgebiet (UESG) Ahr
  * 
  * Datenquellen:
+ * - LVermGeo Rheinland-Pfalz (Open Data)
  * - Geoportal RLP / SGD Nord
  */
 
 function loadAhrtalLayers(map, allLayers) {
-  console.log('[Ahrtal] Lade Hochwasserlinie...');
+  console.log('[Ahrtal] Lade Luftbilder & Hochwasserlinie...');
+  
+  // ============================================
+  // LUFTBILDER 2019 (VOR DER FLUT)
+  // ============================================
+  
+  var luftbild2019 = L.tileLayer.wms('http://geo4.service24.rlp.de/wms/dop_basis.fcgi', {
+    layers: 'dop40',
+    format: 'image/png',
+    transparent: false,
+    version: '1.3.0',
+    crs: L.CRS.EPSG3857,
+    attribution: '&copy;GeoBasis-DE / LVermGeoRP, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    maxZoom: 19,
+    opacity: 1.0
+  });
+  
+  // ============================================
+  // LUFTBILDER 2021 (NACH DER FLUT)
+  // ============================================
+  
+  var luftbild2021 = L.tileLayer.wms('http://geo4.service24.rlp.de/wms/dop_basis.fcgi', {
+    layers: 'dop40',
+    format: 'image/png',
+    transparent: false,
+    version: '1.3.0',
+    crs: L.CRS.EPSG3857,
+    attribution: '&copy;GeoBasis-DE / LVermGeoRP, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    maxZoom: 19,
+    opacity: 1.0
+  });
+  
+  // Hinweis: Sonderbefliegung muss separat beschafft werden
+  var luftbild2021_hochwasser = L.tileLayer.wms('http://geo4.service24.rlp.de/wms/dop_basis.fcgi', {
+    layers: 'dop40',
+    format: 'image/png',
+    transparent: false,
+    version: '1.3.0',
+    crs: L.CRS.EPSG3857,
+    attribution: '&copy;GeoBasis-DE / LVermGeoRP, <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>',
+    maxZoom: 19,
+    opacity: 1.0
+  });
+  
+  // ============================================
+  // LAYER ZU ARRAYS HINZUFUEGEN
+  // ============================================
+  
+  allLayers.push(luftbild2019);
+  allLayers.push(luftbild2021);
+  allLayers.push(luftbild2021_hochwasser);
+  
+  // ============================================
+  // LAYER ZUR BASISKARTEN-CONTROL HINZUFUEGEN
+  // ============================================
+  
+  // Verwende das global gespeicherte Layer Control
+  if (window.globalLayerControl) {
+    window.globalLayerControl.addBaseLayer(luftbild2019, "Luftbild Aktuell (DOP40)");
+    window.globalLayerControl.addBaseLayer(luftbild2021, "Luftbild Alternativ");
+    window.globalLayerControl.addBaseLayer(luftbild2021_hochwasser, "Luftbild Historisch");
+    console.log('[Ahrtal] Luftbild-Layer zur Basiskarten-Auswahl hinzugefuegt');
+  } else {
+    console.error('[Ahrtal] Layer Control nicht gefunden - window.globalLayerControl ist undefined');
+  }
   
   // ============================================
   // UEBERSCHWEMMUNGSGEBIET (UESG) AHR
