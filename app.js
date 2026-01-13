@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Google Satellite (Alternative)
-  var googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+  var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
     maxZoom: 20,
     subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     attribution: '&copy; Google'
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof loadAhrtalLayers === 'function') {
     setTimeout(function() {
       loadAhrtalLayers(map, allLayers);
-      console.log('✅ Ahrtal-Layer (Luftbilder 2019/2021 & Hochwasserlinie) werden geladen...');
+      console.log('✅ Ahrtal-Layer (Hochwasserlinie) wird geladen...');
     }, 500);
   } else {
     console.warn('⚠️ loadAhrtalLayers Funktion nicht gefunden - Layer.js geladen?');
