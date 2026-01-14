@@ -51,6 +51,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   );
 
+  // ============================================
+  // 3D GEODATEN - RHEINLAND-PFALZ
+  // ============================================
+  
+  // Höhenlinien (Contour Lines)
+  var hohenlinien = L.tileLayer(
+    'https://geo.de/tiles/hohenlinien/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; <a href="https://www.lvermgeo.rlp.de" target="_blank">Landesamt für Vermessung und Geoinformation RLP</a>',
+      maxZoom: 18,
+      minZoom: 0,
+      opacity: 0.8
+    }
+  );
+
+  // Liegenschaftskarte (Historisch 2020)
+  var liegenschaftskarte = L.tileLayer(
+    'https://geo.de/tiles/liegenschaftskarte_2020/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; <a href="https://www.lvermgeo.rlp.de" target="_blank">Landesamt für Vermessung und Geoinformation RLP</a> - Liegenschaftskarte hist. 2020',
+      maxZoom: 18,
+      minZoom: 0,
+      opacity: 0.85
+    }
+  );
+
   // Standard-Karte beim Start anzeigen
   osmStandard.addTo(map);
 
@@ -62,12 +88,20 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================
   
   var baseMaps = {
-    "OpenStreetMap": osmStandard,
-    "Humanitarian": osmHumanitarian,
-    "Satellit (Esri)": esriSatellite,
-    "Google Satellit": googleSatellite,
-    "CartoDB Voyager": cartoVoyager,
-    "Sentinel-2 (2020-2021)": sentinel2_2021
+    "🗺️ Referenzkartenansichten": {
+      "OpenStreetMap": osmStandard,
+      "Humanitarian": osmHumanitarian,
+      "CartoDB Voyager": cartoVoyager
+    },
+    "🛰️ Satellitenbilder & Luftaufnahmen": {
+      "Satellit (Esri)": esriSatellite,
+      "Google Satellit": googleSatellite,
+      "Sentinel-2 (2020-2021)": sentinel2_2021
+    },
+    "🏘️ 3D Geodaten (RLP)": {
+      "Höhenlinien": hohenlinien,
+      "Liegenschaftskarte (hist. 2020)": liegenschaftskarte
+    }
   };
 
   // Standard Layer Control für Basiskarten hinzufügen (unten links)
