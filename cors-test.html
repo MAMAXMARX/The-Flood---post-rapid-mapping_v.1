@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Höhenlinien Daten</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .test-button {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+        }
+        .test-button:hover {
+            background-color: #0052a3;
+        }
+        .test-button.loading {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result.loading {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-badge.blocked {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status-badge.allowed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-badge.pending {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        #map {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ CORS Test - lvermgeo.rlp.de Höhenlinien Daten</h1>
+        
+        <div class="info-box">
+            <h3>📋 Test Übersicht</h3>
+            <p>Dieses Script testet, ob die <strong>Höhenlinien-Daten</strong> von lvermgeo.rlp.de 
+            durch CORS blockiert werden. Wenn CORS blockiert ist, brauchst du einen Backend-Proxy (wie den Server.js).</p>
+        </div>
+
+        <!-- Test 1: Direkter Zugriff -->
+        <div class="test-section">
+            <h2>Test 1: Direkter Zugriff auf lvermgeo.rlp.de (Browser-seitig)</h2>
+            <p>Versucht direkt auf die WMS-Höhenlinien-Daten zuzugreifen (wird wahrscheinlich CORS-blockiert)</p>
+            <button class="test-button" onclick="testDirectAccess()">Test starten</button>
+            <div id="result1" class="result"></div>
+        </div>
+
+        <!-- Test 2: Über lokalen Proxy -->
+        <div class="test-section">
+            <h2>Test 2: Zugriff über localhost:3000 Proxy (falls Server läuft)</h2>
+            <p>Versucht über den Node.js Backend-Server auf die Daten zuzugreifen (sollte funktionieren)</p>
+            <button class="test-button" onclick="testProxyAccess()">Test starten</button>
+            <div id="result2" class="result"></div>
+        </div>
+
+        <!-- Test 3: CORS Preflight -->
+        <div class="test-section">
+            <h2>Test 3: CORS Preflight Check</h2>
+            <p>Überprüft die CORS-Header der lvermgeo.rlp.de Domain</p>
+            <button class="test-button" onclick="testCORSHeaders()">Test starten</button>
+            <div id="result3" class="result"></div>
+        </div>
+
+        <!-- Test 4: Höhenlinien-Layer auf Karte -->
+        <div class="test-section">
+            <h2>Test 4: Höhenlinien auf Leaflet-Karte laden</h2>
+            <p>Versucht, die Höhenlinien-Layer auf einer Leaflet-Karte zu laden (über Proxy)</p>
+            <button class="test-button" onclick="loadHeightLinesOnMap()">Höhenlinien laden</button>
+            <div id="map"></div>
+            <div id="result4" class="result"></div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="test-section">
+            <h2>📊 Zusammenfassung</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Beschreibung</th>
+                        <th>CORS-Status</th>
+                        <th>Lösung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Test 1</td>
+                        <td>Direkter Zugriff</td>
+                        <td><span id="status1" class="status-badge pending">Nicht getestet</span></td>
+                        <td>Backend-Proxy notwendig, wenn blockiert</td>
+                    </tr>
+                    <tr>
+                        <td>Test 2</td>
+                        <td>Über Proxy (localhost:3000)</td>
+                        <td><span id="status2" class="status-badge pending">Nicht getestet</span></td>
+                        <td>Funktioniert nur, wenn Server läuft</td>
+                    </tr>
+                    <tr>
+                        <td>Test 3</td>
+                        <td>CORS Headers Check</td>
+                        <td><span id="status3" class="status-badge pending">Nicht getestet</span></td>
+                        <td>Zeigt verfügbare CORS-Headers</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="test-section" style="background-color: #fff3cd; border-color: #ffc107;">
+            <h2>💡 Empfehlungen</h2>
+            <ul>
+                <li><strong>Wenn Test 1 fehlschlägt:</strong> Du brauchst einen Backend-Proxy (Server.js oder Vercel)</li>
+                <li><strong>Wenn Test 2 erfolgreich ist:</strong> Der lokale Proxy funktioniert - deploye ihn auf Vercel</li>
+                <li><strong>Wenn Test 3 zeigt "CORS blockiert":</strong> Verwende definitiv einen Proxy</li>
+                <li><strong>Nächster Schritt:</strong> Höhenlinien-Daten in app.js über Proxy laden</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // ============================================
+        // Test 1: Direkter Zugriff
+        // ============================================
+        async function testDirectAccess() {
+            const resultDiv = document.getElementById('result1');
+            const statusDiv = document.getElementById('status1');
+            
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '⏳ Teste direkten Zugriff auf lvermgeo.rlp.de...';
+            statusDiv.className = 'status-badge pending';
+            statusDiv.textContent = 'Wird getestet...';
+
+            try {
+                // WMS GetCapabilities Request für Höhenlinien
+                const wmsUrl = 'https://lvermgeo.rlp.de/geoserver/ows?service=WMS&version=1.1.1&request=GetCapabilities';
+                
+                const response = await fetch(wmsUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.text();
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ ERFOLG! Direkter Zugriff funktioniert!\n\n` +
+                    `Status: ${response.status} ${response.statusText}\n\n` +
+                    `Response (erste 500 Zeichen):\n${data.substring(0, 500)}...`;
+                
+                statusDiv.className = 'status-badge allowed';
+                statusDiv.textContent = 'ERLAUBT ✓';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ FEHLER - CORS wahrscheinlich blockiert!\n\n` +
+                    `Fehlertyp: ${error.name}\n` +
+                    `Fehlermeldung: ${error.message}\n\n` +
+                    `Dies ist NORMAL! Das bedeutet, dass du einen Backend-Proxy brauchst.`;
+                
+                statusDiv.className = 'status-badge blocked';
+                statusDiv.textContent = 'BLOCKIERT ✗';
+            }
+        }
+
+        // ============================================
+        // Test 2: Zugriff über Proxy
+        // ============================================
+        async function testProxyAccess() {
+            const resultDiv = document.getElementById('result2');
+            const statusDiv = document.getElementById('status2');
+            
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '⏳ Teste Zugriff über localhost:3000 Proxy...';
+            statusDiv.className = 'status-badge pending';
+            statusDiv.textContent = 'Wird getestet...';
+
+            try {
+                // Test über lokalen Proxy
+                const proxyUrl = '/api/proxy/lvermgeo?url=https://lvermgeo.rlp.de/geoserver/ows?service=WMS&version=1.1.1&request=GetCapabilities';
+                
+                const response = await fetch(proxyUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                const data = await response.text();
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ ERFOLG! Proxy-Zugriff funktioniert!\n\n` +
+                    `Status: ${response.status} ${response.statusText}\n\n` +
+                    `Response (erste 500 Zeichen):\n${data.substring(0, 500)}...`;
+                
+                statusDiv.className = 'status-badge allowed';
+                statusDiv.textContent = 'FUNKTIONIERT ✓';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ FEHLER - Proxy nicht verfügbar oder Server läuft nicht!\n\n` +
+                    `Fehlertyp: ${error.name}\n` +
+                    `Fehlermeldung: ${error.message}\n\n` +
+                    `Stelle sicher, dass der Node.js Server läuft:\n` +
+                    `cd /Users/maltekern/Desktop/The-Flood---post-rapid-mapping_v.1\n` +
+                    `npm start`;
+                
+                statusDiv.className = 'status-badge blocked';
+                statusDiv.textContent = 'NICHT VERFÜGBAR ✗';
+            }
+        }
+
+        // ============================================
+        // Test 3: CORS Headers Check
+        // ============================================
+        async function testCORSHeaders() {
+            const resultDiv = document.getElementById('result3');
+            const statusDiv = document.getElementById('status3');
+            
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '⏳ Überprüfe CORS-Header von lvermgeo.rlp.de...';
+            statusDiv.className = 'status-badge pending';
+            statusDiv.textContent = 'Wird getestet...';
+
+            try {
+                const response = await fetch('https://lvermgeo.rlp.de/geoserver/ows', {
+                    method: 'OPTIONS'
+                });
+
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Max-Age': response.headers.get('Access-Control-Max-Age')
+                };
+
+                const hasCORS = corsHeaders['Access-Control-Allow-Origin'] !== null;
+
+                resultDiv.className = hasCORS ? 'result success' : 'result error';
+                resultDiv.textContent = `CORS-Header:\n\n` +
+                    Object.entries(corsHeaders)
+                        .map(([key, value]) => `${key}: ${value || 'nicht vorhanden'}`)
+                        .join('\n') +
+                    `\n\n${hasCORS ? '✅ CORS ist aktiviert' : '❌ CORS ist NICHT aktiviert'}`;
+                
+                if (hasCORS) {
+                    statusDiv.className = 'status-badge allowed';
+                    statusDiv.textContent = 'CORS AN ✓';
+                } else {
+                    statusDiv.className = 'status-badge blocked';
+                    statusDiv.textContent = 'CORS AUS ✗';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Fehler beim Überprüfen der CORS-Header:\n\n` +
+                    `${error.name}: ${error.message}`;
+                
+                statusDiv.className = 'status-badge blocked';
+                statusDiv.textContent = 'FEHLER ✗';
+            }
+        }
+
+        // ============================================
+        // Test 4: Höhenlinien auf Karte laden
+        // ============================================
+        let map = null;
+        async function loadHeightLinesOnMap() {
+            const resultDiv = document.getElementById('result4');
+            const mapDiv = document.getElementById('map');
+            
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '⏳ Lade Höhenlinien-Layer auf Karte...';
+
+            try {
+                // Initialisiere Karte (Ahrtal Region)
+                if (!map) {
+                    map = L.map('map').setView([50.450453753490834, 6.888650882405452], 13);
+                    
+                    // OpenStreetMap als Base Layer (ausgeblendet für Tests)
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap',
+                        maxZoom: 19,
+                        opacity: 0  // Auf 0 gesetzt - OpenStreetMap ist unsichtbar
+                    }).addTo(map);
+                }
+
+                // Wichtig: Die GeoPortal RLP Höhenlinien URL muss über Proxy gehen
+                // WMS Layer für Höhenlinien
+                const wmsLayer = L.tileLayer.wms('/api/proxy/wms', {
+                    layers: 'rp_hoeli',  // Korrekter Layer-Name: Höhenlinien RP
+                    format: 'image/png',
+                    transparent: true,
+                    attribution: '© LVermGeo RLP - Höhenlinien (ATKIS-DGM)',
+                    opacity: 0.7
+                });
+
+                wmsLayer.addTo(map);
+
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ ERFOLG! Höhenlinien-Layer wurde auf der Karte geladen!\n\n` +
+                    `WMS Layer: DOP40_RGB\n` +
+                    `Proxy-Endpoint: /api/lvermgeo?url=...\n` +
+                    `Basis-URL: geoserver.rlp.de/geoserver/ows\n` +
+                    `Status: Layer sollte JETZT auf der Karte sichtbar sein (semi-transparent über OSM)\n\n` +
+                    `Hinweis: Der Layer wird mit 60% Transparenz über OpenStreetMap angezeigt.\n` +
+                    `Wenn nur OSM sichtbar ist, funktioniert der WMS-Proxy nicht korrekt.`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ FEHLER beim Laden der Höhenlinien:\n\n` +
+                    `${error.name}: ${error.message}\n\n` +
+                    `Mögliche Lösungen:\n` +
+                    `1. Stelle sicher, dass der Server läuft (npm start)\n` +
+                    `2. Überprüfe die WMS Layer-Namen\n` +
+                    `3. Öffne Browser DevTools (F12) für mehr Infos\n` +
+                    `4. Überprüfe die Server-Logs auf Fehler`;
+            }
+        }
+
+        // Auto-Test beim Laden
+        console.log('%c🗺️ CORS Test Script geladen', 'color: blue; font-size: 16px; font-weight: bold;');
+        console.log('Klicke auf die Test-Buttons um die Tests zu starten!');
+    </script>
+</body>
+</html>
