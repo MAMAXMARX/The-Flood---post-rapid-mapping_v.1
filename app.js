@@ -51,6 +51,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   );
 
+  // ============================================
+  // HÖHENLINIEN WMS (GeoPortal RLP)
+  // ============================================
+  
+  // Höhenlinien von GeoPortal RLP über Proxy laden
+  var hoehenlinien = L.tileLayer.wms('/api/proxy/wms', {
+    layers: 'rp_hoeli',  // Höhenlinien RP Layer
+    format: 'image/png',
+    transparent: true,
+    attribution: '© <a href="https://lvermgeo.rlp.de">LVermGeo RLP</a> - ATKIS-DGM',
+    minZoom: 0,
+    maxZoom: 18
+  });
+
+  // Speichere Höhenlinien global für Legende
+  window.hoehenlinienLayer = hoehenlinien;
+
   // Standard-Karte beim Start anzeigen
   osmStandard.addTo(map);
 
@@ -70,14 +87,70 @@ document.addEventListener('DOMContentLoaded', function () {
     "Sentinel-2 (2020-2021)": sentinel2_2021
   };
 
+  var overlayMaps = {
+    "Höhenlinien": hoehenlinien
+  };
+
   // Standard Layer Control für Basiskarten hinzufügen (unten links)
-  var layerControl = L.control.layers(baseMaps, {}, {
+  var layerControl = L.control.layers(baseMaps, overlayMaps, {
     position: 'bottomleft',
     collapsed: false
   }).addTo(map);
   
   // Speichere Layer Control global für Ahrtal-Layer
   window.globalLayerControl = layerControl;
+  
+  // Ermögliche Toggle auf Layer-Namen klicken (Höhenlinien und andere Overlay-Layer)
+  setTimeout(function() {
+    var layerLabels = document.querySelectorAll('.leaflet-control-layers-overlays label');
+    layerLabels.forEach(function(label) {
+      label.style.cursor = 'pointer';
+      label.addEventListener('click', function(e) {
+        // Nur toggle wenn nicht direkt auf Checkbox geklickt
+        if (e.target.tagName !== 'INPUT') {
+          var checkbox = this.querySelector('input[type="checkbox"]');
+          if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        }
+      });
+    });
+  }, 100);
+  
+  // ============================================
+  // TOGGLE BASE LAYER ZUM AUSBLENDEN
+  // ============================================
+  
+  // Tracke den aktuell aktiven Base-Layer
+  var lastSelectedBaseLayer = osmStandard;
+  
+  // Event-Listener für Base-Layer Clicks
+  setTimeout(function() {
+    var baseLayerLabels = document.querySelectorAll('.leaflet-control-layers-base label');
+    baseLayerLabels.forEach(function(label) {
+      label.addEventListener('click', function(e) {
+        var checkbox = this.querySelector('input[type="radio"]');
+        if (!checkbox) return;
+        
+        // Finde welcher Layer das ist
+        var layerName = label.innerText.trim();
+        var selectedLayer = baseMaps[layerName];
+        
+        if (!selectedLayer) return;
+        
+        // Wenn derselbe Layer nochmal geklickt wird, entferne ihn
+        if (lastSelectedBaseLayer === selectedLayer && map.hasLayer(selectedLayer)) {
+          map.removeLayer(selectedLayer);
+          checkbox.checked = false;
+          lastSelectedBaseLayer = null;
+        } else {
+          // Sonst wechsle normal zum neuen Layer
+          lastSelectedBaseLayer = selectedLayer;
+        }
+      });
+    });
+  }, 100);
   
   // ============================================
   // MONOCHROME FILTER IN LAYER CONTROL EINFÜGEN
