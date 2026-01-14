@@ -38,18 +38,16 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // ============================================
-  // NEU: DOP40 SONDERBEFLIEGUNG HOCHWASSER 2021
+  // SENTINEL-2 CLOUDLESS (Mai 2020 - April 2021)
   // ============================================
   
-  // WMTS-Dienst von Geoportal RLP (umgeht CORB-Problem)
-  var dop40Hochwasser = L.tileLayer(
-    'https://www.geoportal.rlp.de/spatial-objects/935/tiles/{z}/{x}/{y}.png',
+  // WICHTIG: Dieses Mosaik zeigt den Zustand VOR der Flut (Mai 2020 - April 2021)
+  var sentinel2_2021 = L.tileLayer(
+    'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2021_3857/default/g/{z}/{y}/{x}.jpg',
     {
-      attribution: '&copy; <a href="https://www.geoportal.rlp.de" target="_blank">Geoportal RLP</a> - DOP40 Sonderbefliegung Hochwasser Juli 2021',
-      maxZoom: 20,
-      minZoom: 10,
-      tileSize: 256,
-      crossOrigin: true
+      attribution: '&copy; <a href="https://s2maps.eu" target="_blank">Sentinel-2 cloudless</a> by <a href="https://eox.at" target="_blank">EOX</a> (Modified Copernicus Sentinel data 2020-2021)',
+      maxZoom: 18,
+      minZoom: 0
     }
   );
 
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     "Satellit (Esri)": esriSatellite,
     "Google Satellit": googleSatellite,
     "CartoDB Voyager": cartoVoyager,
-    "Sonderbefliegung Juli 2021": dop40Hochwasser
+    "Sentinel-2 (2020-2021)": sentinel2_2021
   };
 
   // Standard Layer Control für Basiskarten hinzufügen (unten links)
