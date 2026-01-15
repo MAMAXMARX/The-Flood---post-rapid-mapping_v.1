@@ -88,15 +88,26 @@ app.get('/api/proxy/lvermgeo', async (req, res) => {
 
 /**
  * WMS Service Proxy
- * GET /api/proxy/wms?service=...&request=...
+ * GET /api/proxy/wms?service=...&request=...&layers=...
  */
 app.get('/api/proxy/wms', async (req, res) => {
   try {
-    // Verwende GeoPortal RLP Höhenlinien WMS Service
-    const baseUrl = 'https://geo4.service24.rlp.de/wms/hoeli.fcgi';
+    // Bestimme die richtige Base-URL basierend auf dem Layer-Namen
+    const layers = req.query.layers || '';
+    let baseUrl = 'https://geo4.service24.rlp.de/wms/hoeli.fcgi'; // Default
+    
+    if (layers.includes('rp_dop40_sonderbefliegung_hochwasser')) {
+      // Sonderüberfliegung Ahr 2021
+      baseUrl = 'https://geo4.service24.rlp.de/wms/rp_dop40_sonderbefliegung_hochwasser.fcgi';
+    } else if (layers.includes('rp_hoeli')) {
+      // Höhenlinien
+      baseUrl = 'https://geo4.service24.rlp.de/wms/hoeli.fcgi';
+    }
+    
     const queryString = new URLSearchParams(req.query).toString();
     const fullUrl = `${baseUrl}?${queryString}`;
     
+    console.log(`[WMS PROXY] Service: ${layers} -> ${baseUrl}`);
     console.log(`[WMS PROXY] Abrufen: ${fullUrl}`);
     
     const response = await fetch(fullUrl, {
@@ -106,7 +117,7 @@ app.get('/api/proxy/wms', async (req, res) => {
     });
     
     if (!response.ok) {
-      throw new Error(`GeoServer returned ${response.status}`);
+      throw new Error(`WMS Service returned ${response.status}`);
     }
     
     const contentType = response.headers.get('content-type');

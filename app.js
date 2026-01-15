@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   
-  var map = L.map('map').setView([50.450453753490834, 6.888650882405452], 13);
+  var map = L.map('map').setView([50.446832, 6.888238], 14);
+  console.log('🌍 Leaflet Karte initialisiert'); 
 
   // ============================================
   // VERSCHIEDENE KARTENANSICHTEN (BASE LAYERS)
@@ -65,11 +66,25 @@ document.addEventListener('DOMContentLoaded', function () {
     maxZoom: 18
   });
 
+  // ============================================
+  // SONDERÜBERFLIEGUNG AHR 2021 WMS (GeoPortal RLP)
+  // ============================================
+  
+  // Sonderüberfliegung Ahr 2021 von GeoPortal RLP über Proxy laden
+  var sonderueberfliegungAhr2021 = L.tileLayer.wms('/api/proxy/wms', {
+    layers: 'rp_dop40_sonderbefliegung_hochwasser_ahr_2021_rgb',
+    format: 'image/png',
+    transparent: false,
+    attribution: '© <a href="https://lvermgeo.rlp.de">LVermGeo RLP</a> - DOP40 Hochwasser',
+    minZoom: 0,
+    maxZoom: 18
+  });
+
   // Speichere Höhenlinien global für Legende
   window.hoehenlinienLayer = hoehenlinien;
 
-  // Standard-Karte beim Start anzeigen
-  osmStandard.addTo(map);
+  // Standard-Karte beim Start anzeigen: Sonderüberfliegung Ahr 2021
+  sonderueberfliegungAhr2021.addTo(map);
 
   // Array für alle Layer
   var allLayers = [];
@@ -79,12 +94,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================
   
   var baseMaps = {
-    "OpenStreetMap": osmStandard,
-    "Humanitarian": osmHumanitarian,
-    "Satellit (Esri)": esriSatellite,
+    "Sonderüberfliegung Ahr 2021": sonderueberfliegungAhr2021,
     "Google Satellit": googleSatellite,
-    "CartoDB Voyager": cartoVoyager,
-    "Sentinel-2 (2020-2021)": sentinel2_2021
+    "CartoDB Voyager": cartoVoyager
   };
 
   var overlayMaps = {
