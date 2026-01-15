@@ -1,0 +1,21 @@
+
+> flood-rapid-mapping-server@1.0.0 start
+> node server.js
+
+
+╔═══════════════════════════════════════════╗
+║  Rapid Mapping Backend Server             ║
+║  Version 1.0.0                            ║
+╠═══════════════════════════════════════════╣
+║  Server läuft auf:                        ║
+║  http://localhost:3000                    ║
+║                                           ║
+║  API Endpoints:                           ║
+║  - GET /api/health                        ║
+║  - GET /api/info                          ║
+║  - GET /api/proxy/lvermgeo                ║
+║  - GET /api/proxy/wms                     ║
+║  - GET /api/proxy                         ║
+╚═══════════════════════════════════════════╝
+  
+Drücke Ctrl+C zum Beenden
