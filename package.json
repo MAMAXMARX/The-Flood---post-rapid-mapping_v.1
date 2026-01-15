@@ -5,9 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "echo 'Build complete'",
-    "vercel-build": "echo 'Vercel build complete'"
+    "dev": "nodemon server.js"
   },
   "keywords": ["leaflet", "geodata", "rapid-mapping", "ahrtal"],
   "author": "MAMAXMARX",
