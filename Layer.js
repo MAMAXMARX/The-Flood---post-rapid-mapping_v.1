@@ -58,11 +58,10 @@ function loadUESGDataFromFile(map, allLayers) {
         style: function(feature) {
           return {
             color: '#00ffb3ff',
-            weight: 1,
-            opacity: 0.5,
+            weight: 2,
+            opacity: 0.8,
             fillColor: '#00ffb37b',
-            fillOpacity: 0.3,
-            dashArray: '5, 5'
+            fillOpacity: 0.3
           };
         },
         onEachFeature: function(feature, layer) {

@@ -327,11 +327,13 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
 }
 
 function updateMapView(map, allLayers) {
-  if (allLayers.length > 0) {
-    var group = L.featureGroup(allLayers);
-    map.fitBounds(group.getBounds(), { padding: [50, 50] });
-    console.log(`✓ Karte angepasst für ${allLayers.length} Layer`);
-  }
+  // DEAKTIVIERT - hat manuellen Zoom überschrieben
+  // if (allLayers.length > 0) {
+  //   var group = L.featureGroup(allLayers);
+  //   map.fitBounds(group.getBounds(), { padding: [50, 50] });
+  //   console.log(`✓ Karte angepasst für ${allLayers.length} Layer`);
+  // }
+  console.log('ℹ️ Auto-Zoom deaktiviert - Manueller Zoom bleibt erhalten');
 }
 
 // Hauptfunktion zum Laden aller Rapid Mapping Daten
@@ -442,7 +444,7 @@ function loadRapidMappingData(map, allLayers) {
       weight: 2,
       opacity: 0.7
     },
-    'Hydrographie',
+    'Gewässer',
     'Hydrography Lines',
     map,
     allLayers,
@@ -458,7 +460,7 @@ function loadRapidMappingData(map, allLayers) {
       fillOpacity: 0.4,
       weight: 1
     },
-    'Hydrographie',
+    'Gewässer',
     'Hydrography Areas',
     map,
     allLayers,
@@ -497,11 +499,25 @@ function createCustomLayerControl(map) {
       </div>
       <div class="legend-date-content" data-section-content="11_08" style="display: none;">
         <div class="legend-section-compact">
-          <label class="legend-item-compact">
-            <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
-            <span class="layer-name">Untersuchungsgebiet</span>
-            <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
-          </label>
+          <div class="legend-category-compact">
+            <span class="toggle-icon-small">▼</span>
+            <label style="flex:1;">
+              <input type="checkbox" class="category-toggle" data-category="aoi" data-date="11_08" checked>
+              <strong>Untersuchungsgebiet (AoI)</strong>
+            </label>
+          </div>
+          <div class="legend-subcategory-compact" data-category="aoi">
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
+              <span class="layer-name">Untersuchungsgebiet</span>
+              <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
+            </label>
+            <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="notAnalysed" data-date="11_08" checked>
+              <span class="layer-name">Nicht analysiert (Wolken)</span>
+              <span class="legend-symbol-small" style="background: #eeeeee; border: 1px dashed #666666;"></span>
+            </label>
+          </div>
         </div>
         <div class="legend-section-compact">
           <div class="legend-category-compact">
@@ -601,35 +617,19 @@ function createCustomLayerControl(map) {
           </div>
           <div class="legend-subcategory-compact" data-category="flood">
             <label class="legend-item-compact">
+              <input type="checkbox" class="layer-toggle" data-layer="hydrography" data-date="11_08">
+              <span class="layer-name">Gewässer</span>
+              <span class="legend-symbol-small" style="background: #6699cc; border: 1px solid #0066cc;"></span>
+            </label>
+            <label class="legend-item-compact">
               <input type="checkbox" class="layer-toggle" data-layer="floodedArea" data-date="11_08" checked>
-              <span class="layer-name">Flooded Area</span>
+              <span class="layer-name">Aktive Flut</span>
               <span class="legend-symbol-small" style="background: #3399ff; border: 2px solid #0066cc;"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="layer-toggle" data-layer="floodTrace" data-date="11_08" checked>
-              <span class="layer-name">Flood Trace</span>
+              <span class="layer-name">Überflutungsspur</span>
               <span class="legend-symbol-small" style="background: #00cccc; border: 1px solid #006666;"></span>
-            </label>
-          </div>
-        </div>
-        <div class="legend-section-compact">
-          <div class="legend-category-compact">
-            <span class="toggle-icon-small">▼</span>
-            <label style="flex:1;">
-              <input type="checkbox" class="category-toggle" data-category="context" data-date="11_08">
-              <strong>Kontext & Hintergrund</strong>
-            </label>
-          </div>
-          <div class="legend-subcategory-compact" data-category="context">
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="notAnalysed" data-date="11_08" checked>
-              <span class="layer-name">Nicht analysiert (Wolken)</span>
-              <span class="legend-symbol-small" style="background: #eeeeee; border: 1px dashed #666666;"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="hydrography" data-date="11_08">
-              <span class="layer-name">Hydrographie</span>
-              <span class="legend-symbol-small" style="background: #6699cc; border: 1px solid #0066cc;"></span>
             </label>
           </div>
         </div>
@@ -691,7 +691,18 @@ function createCustomLayerControl(map) {
   controlDiv.querySelectorAll('.category-toggle[data-date="11_08"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function(e) {
       var category = this.getAttribute('data-category');
-      if (category === 'buildings') {
+      if (category === 'aoi') {
+        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
+        subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
+          if (this.checked) {
+            subCheckbox.checked = true;
+            subCheckbox.dispatchEvent(new Event('change'));
+          } else {
+            subCheckbox.checked = false;
+            subCheckbox.dispatchEvent(new Event('change'));
+          }
+        }.bind(this));
+      } else if (category === 'buildings') {
         if (this.checked) {
           map.addLayer(layerGroups.buildings);
         } else {
@@ -710,17 +721,6 @@ function createCustomLayerControl(map) {
           map.removeLayer(layerGroups.transportation);
         }
       } else if (category === 'flood') {
-        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
-        subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
-          if (this.checked) {
-            subCheckbox.checked = true;
-            subCheckbox.dispatchEvent(new Event('change'));
-          } else {
-            subCheckbox.checked = false;
-            subCheckbox.dispatchEvent(new Event('change'));
-          }
-        }.bind(this));
-      } else if (category === 'context') {
         var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
           if (this.checked) {

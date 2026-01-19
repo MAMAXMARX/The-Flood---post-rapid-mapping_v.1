@@ -290,12 +290,12 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       <div class="legend-subcategory-compact" data-category="flood">
         <label class="legend-item-compact">
           <input type="checkbox" class="layer-toggle" data-layer="floodedArea_19_07" data-date="19_07">
-          <span class="layer-name">Flooded Area</span>
+          <span class="layer-name">Aktive Flut</span>
           <span class="legend-symbol-small" style="background: #3399ff; border: 2px solid #0066cc;"></span>
         </label>
         <label class="legend-item-compact">
           <input type="checkbox" class="layer-toggle" data-layer="floodTrace_19_07" data-date="19_07">
-          <span class="layer-name">Flood Trace</span>
+          <span class="layer-name">Überflutungsspur</span>
           <span class="legend-symbol-small" style="background: #00cccc; border: 1px solid #006666;"></span>
         </label>
       </div>

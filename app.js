@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   
-  // ============================================
-  // NEUE STARTKOORDINATEN & ZOOM
-  // ============================================
-  var map = L.map('map').setView([50.47296726489117, 6.954176637076611], 12);
+  // ✅ ÄNDERUNG 1: Neue Koordinaten & Zoom 15
+  var map = L.map('map').setView([50.47296726489117, 6.954176637076611], 15);
 
   // ============================================
   // VERSCHIEDENE KARTENANSICHTEN (BASE LAYERS)
@@ -40,45 +38,15 @@ document.addEventListener('DOMContentLoaded', function () {
     maxZoom: 19
   });
 
-  // ============================================
-  // SENTINEL-2 CLOUDLESS (Mai 2020 - April 2021)
-  // ============================================
-  
-  // WICHTIG: Dieses Mosaik zeigt den Zustand VOR der Flut (Mai 2020 - April 2021)
-  var sentinel2_2021 = L.tileLayer(
-    'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2021_3857/default/g/{z}/{y}/{x}.jpg',
-    {
-      attribution: '&copy; <a href="https://s2maps.eu" target="_blank">Sentinel-2 cloudless</a> by <a href="https://eox.at" target="_blank">EOX</a> (Modified Copernicus Sentinel data 2020-2021)',
-      maxZoom: 18,
-      minZoom: 0
-    }
-  );
-
-  // ============================================
-  // HÖHENLINIEN WMS (GeoPortal RLP)
-  // ============================================
-  
-  // Höhenlinien von GeoPortal RLP über Proxy laden
-  var hoehenlinien = L.tileLayer.wms('/api/proxy/wms', {
-    layers: 'rp_hoeli',  // Höhenlinien RP Layer
-    format: 'image/png',
-    transparent: true,
-    attribution: '© <a href="https://lvermgeo.rlp.de">LVermGeo RLP</a> - ATKIS-DGM',
-    minZoom: 0,
-    maxZoom: 18
-  });
-
-  // Speichere Höhenlinien global für Legende
-  window.hoehenlinienLayer = hoehenlinien;
-
-  // Standard-Karte beim Start anzeigen
-  osmStandard.addTo(map);
+  // ✅ ÄNDERUNG 2: Esri Satellit beim Start aktivieren
+  esriSatellite.addTo(map);
 
   // Array für alle Layer
   var allLayers = [];
 
   // ============================================
   // BASE LAYER CONTROL (Kartenauswahl)
+  // ✅ ÄNDERUNG 3: Sentinel-2 entfernt
   // ============================================
   
   var baseMaps = {
@@ -86,13 +54,11 @@ document.addEventListener('DOMContentLoaded', function () {
     "Humanitarian": osmHumanitarian,
     "Satellit (Esri)": esriSatellite,
     "Google Satellit": googleSatellite,
-    "CartoDB Voyager": cartoVoyager,
-    "Sentinel-2 (2020-2021)": sentinel2_2021
+    "CartoDB Voyager": cartoVoyager
   };
 
-  var overlayMaps = {
-    "Höhenlinien": hoehenlinien
-  };
+  // ✅ ÄNDERUNG 4: Höhenlinien entfernt
+  var overlayMaps = {};
 
   // Standard Layer Control für Basiskarten hinzufügen (unten links)
   var layerControl = L.control.layers(baseMaps, overlayMaps, {
@@ -103,30 +69,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // Speichere Layer Control global für Ahrtal-Layer
   window.globalLayerControl = layerControl;
   
-  // Ermögliche Toggle auf Layer-Namen klicken (Höhenlinien und andere Overlay-Layer)
-  setTimeout(function() {
-    var layerLabels = document.querySelectorAll('.leaflet-control-layers-overlays label');
-    layerLabels.forEach(function(label) {
-      label.style.cursor = 'pointer';
-      label.addEventListener('click', function(e) {
-        // Nur toggle wenn nicht direkt auf Checkbox geklickt
-        if (e.target.tagName !== 'INPUT') {
-          var checkbox = this.querySelector('input[type="checkbox"]');
-          if (checkbox) {
-            checkbox.checked = !checkbox.checked;
-            checkbox.dispatchEvent(new Event('change'));
-          }
-        }
-      });
-    });
-  }, 100);
-  
   // ============================================
   // TOGGLE BASE LAYER ZUM AUSBLENDEN
   // ============================================
   
-  // Tracke den aktuell aktiven Base-Layer
-  var lastSelectedBaseLayer = osmStandard;
+  // ✅ ÄNDERUNG 5: lastSelectedBaseLayer auf Esri
+  var lastSelectedBaseLayer = esriSatellite;
   
   // Event-Listener für Base-Layer Clicks
   setTimeout(function() {
@@ -157,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // ============================================
   // MONOCHROME FILTER IN LAYER CONTROL EINFÜGEN
+  // ✅ ÄNDERUNGEN 6 & 7: Beim Start aktiviert
   // ============================================
   
   // Warte bis Layer Control im DOM ist
@@ -180,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.id = 'monochromeToggle';
+      checkbox.checked = true; // ✅ Beim Start aktiviert
       checkbox.style.cursor = 'pointer';
       checkbox.style.width = '14px';
       checkbox.style.height = '14px';
@@ -198,6 +148,8 @@ document.addEventListener('DOMContentLoaded', function () {
       
       // Event Listener für Monochrome Toggle
       var mapElement = document.getElementById('map');
+      mapElement.classList.add('monochrome'); // ✅ Sofort aktivieren
+      
       checkbox.addEventListener('change', function() {
         if (this.checked) {
           mapElement.classList.add('monochrome');
@@ -245,319 +197,85 @@ document.addEventListener('DOMContentLoaded', function () {
     console.warn('⚠️ loadAhrtalLayers Funktion nicht gefunden - Layer.js geladen?');
   }
 
+  // ============================================
+  // ✅ ÄNDERUNG 8: LEGENDE EIN-/AUSBLENDEN
+  // ============================================
+  
+  setTimeout(function() {
+    var legendControl = document.querySelector('.custom-layer-control');
+    if (legendControl) {
+      // Erstelle Toggle-Button
+      var toggleButton = document.createElement('button');
+      toggleButton.innerHTML = '◀';
+      toggleButton.className = 'legend-toggle-button';
+      toggleButton.title = 'Legende ein-/ausblenden';
+      toggleButton.style.cssText = `
+        position: absolute;
+        left: -30px;
+        top: 10px;
+        width: 28px;
+        height: 28px;
+        background: white;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        box-shadow: -2px 2px 6px rgba(0,0,0,0.3);
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        z-index: 1000;
+      `;
+      
+      legendControl.style.position = 'relative';
+      legendControl.appendChild(toggleButton);
+      
+      var isVisible = true;
+      toggleButton.addEventListener('click', function() {
+        if (isVisible) {
+          // Ausblenden
+          legendControl.style.transform = 'translateX(100%)';
+          legendControl.style.opacity = '0';
+          toggleButton.style.left = '-40px';
+          toggleButton.innerHTML = '▶';
+          isVisible = false;
+        } else {
+          // Einblenden
+          legendControl.style.transform = 'translateX(0)';
+          legendControl.style.opacity = '1';
+          toggleButton.style.left = '-30px';
+          toggleButton.innerHTML = '◀';
+          isVisible = true;
+        }
+      });
+      
+      // Sanfte Animation
+      legendControl.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    }
+  }, 600);
+
   // Karte nach kurzer Verzögerung neu rendern
   setTimeout(function() { 
     map.invalidateSize(); 
   }, 100);
   
   // ============================================
-  // CLIENT-SIDE SVG EXPORT (KEIN BACKEND NÖTIG!)
+  // HOCHAUFLÖSENDER KARTEN-EXPORT
   // ============================================
   
-  // Erstelle Custom SVG Export Button
-  var SvgExportControl = L.Control.extend({
-    options: {
-      position: 'topleft'
-    },
-    
-    onAdd: function(map) {
-      var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom-svg-export');
-      
-      var button = L.DomUtil.create('a', 'leaflet-control-svg-export-button', container);
-      button.href = '#';
-      button.title = 'Sichtbare Layer als SVG exportieren';
-      button.innerHTML = '📥'; // Download Icon
-      button.style.fontSize = '18px';
-      button.style.width = '30px';
-      button.style.height = '30px';
-      button.style.lineHeight = '30px';
-      button.style.textAlign = 'center';
-      button.style.display = 'block';
-      button.style.backgroundColor = 'white';
-      button.style.color = 'black';
-      button.style.textDecoration = 'none';
-      
-      L.DomEvent.on(button, 'click', function(e) {
-        L.DomEvent.preventDefault(e);
-        exportVisibleLayersAsSVG(map);
-      });
-      
-      return container;
-    }
-  });
+  L.easyPrint({
+    title: 'Karte als PNG exportieren',
+    position: 'topleft',
+    sizeModes: ['Current', 'A4Landscape', 'A4Portrait'],
+    filename: 'EMSR517_AOI15_Schuld_Flutkatastrophe',
+    exportOnly: true,
+    hideControlContainer: true,
+    hideClasses: ['leaflet-control-layers', 'custom-layer-control'],
+    customWindowTitle: 'EMSR517 AOI15 - Schuld Flutkatastrophe Export'
+  }).addTo(map);
   
-  map.addControl(new SvgExportControl());
-  
-  console.log('✓ Karte geladen - Monochrome Filter & SVG Export (client-side) verfügbar');
+  console.log('✓ Karte geladen - Monochrome Filter & Export verfügbar');
   console.log('🌊 Ahrtal-Layer-Integration aktiviert');
-  console.log('🗺️ Neue Startkoordinaten: 50.473°N, 6.954°E @ Zoom 12');
+  console.log('🎨 Esri Satellit & Monochrome beim Start aktiv');
+  console.log('📖 Legende ist ein-/ausblendbar');
+  console.log('🗺️ Zoom 15 @ 50.473°N, 6.954°E');
 });
-
-// ============================================
-// CLIENT-SIDE SVG EXPORT FUNKTIONEN
-// ============================================
-
-function exportVisibleLayersAsSVG(map) {
-  console.log('🔄 Sammle sichtbare Layer für SVG-Export...');
-  
-  // Sammle alle sichtbaren GeoJSON Layer
-  var visibleLayers = [];
-  
-  // Durchlaufe alle Layer auf der Karte
-  map.eachLayer(function(layer) {
-    // Prüfe ob es ein GeoJSON Layer ist
-    if (layer.toGeoJSON && typeof layer.toGeoJSON === 'function') {
-      try {
-        var geojson = layer.toGeoJSON();
-        
-        // Extrahiere Style-Informationen
-        var style = {
-          color: layer.options.color || '#000000',
-          weight: layer.options.weight || 1,
-          opacity: layer.options.opacity || 1,
-          fillColor: layer.options.fillColor || layer.options.color || '#cccccc',
-          fillOpacity: layer.options.fillOpacity || 0.3,
-          dashArray: layer.options.dashArray || null
-        };
-        
-        visibleLayers.push({
-          geojson: geojson,
-          style: style,
-          name: layer.options.layerName || 'Unnamed Layer'
-        });
-      } catch (e) {
-        console.warn('Layer konnte nicht exportiert werden:', e);
-      }
-    }
-  });
-  
-  console.log('✓ ' + visibleLayers.length + ' sichtbare Layer gefunden');
-  
-  if (visibleLayers.length === 0) {
-    alert('Keine exportierbaren Layer sichtbar. Bitte aktiviere Layer in der Legende.');
-    return;
-  }
-  
-  // Hole aktuelle Kartenansicht
-  var bounds = map.getBounds();
-  var zoom = map.getZoom();
-  
-  // Generiere SVG direkt im Browser
-  var svgContent = generateSVGFromLayers(visibleLayers, bounds, zoom);
-  
-  // Download SVG
-  downloadSVG(svgContent);
-}
-
-function generateSVGFromLayers(layers, bounds, zoom) {
-  // Extrahiere Bounds
-  var minLat = bounds.getSouth();
-  var maxLat = bounds.getNorth();
-  var minLon = bounds.getWest();
-  var maxLon = bounds.getEast();
-  
-  // Berechne Mittelpunkt für Aspect Ratio Korrektur
-  var centerLat = (minLat + maxLat) / 2;
-  var centerLatRad = centerLat * Math.PI / 180;
-  var aspectRatio = Math.cos(centerLatRad);
-  
-  // SVG Dimensionen
-  var svgWidth = 2000;
-  var svgHeight = 2000;
-  var padding = 50;
-  
-  // Berechne Skalierung mit Aspect Ratio Korrektur
-  var lonRange = maxLon - minLon;
-  var latRange = maxLat - minLat;
-  var correctedLonRange = lonRange * aspectRatio;
-  
-  var scaleLon = (svgWidth - 2 * padding) / correctedLonRange;
-  var scaleLat = (svgHeight - 2 * padding) / latRange;
-  var scale = Math.min(scaleLon, scaleLat);
-  
-  // Koordinaten-Konvertierung
-  function coordToSVG(lon, lat) {
-    var x = (lon - minLon) * aspectRatio * scale + padding;
-    var y = svgHeight - ((lat - minLat) * scale + padding);
-    return { x: x, y: y };
-  }
-  
-  // Sammle alle SVG Pfade
-  var svgPaths = [];
-  
-  layers.forEach(function(layer, layerIdx) {
-    var geojson = layer.geojson;
-    var style = layer.style;
-    
-    // Extrahiere Features
-    var features = [];
-    if (geojson.type === 'FeatureCollection') {
-      features = geojson.features || [];
-    } else if (geojson.type === 'Feature') {
-      features = [geojson];
-    } else {
-      features = [{ type: 'Feature', geometry: geojson, properties: {} }];
-    }
-    
-    features.forEach(function(feature, featureIdx) {
-      var geometry = feature.geometry || {};
-      var geomType = geometry.type || '';
-      var coords = geometry.coordinates || [];
-      
-      var pathId = 'layer' + layerIdx + '_feature' + featureIdx;
-      
-      if (geomType === 'Polygon') {
-        svgPaths.push(createPolygonPath(coords, style, pathId, coordToSVG));
-      } else if (geomType === 'MultiPolygon') {
-        coords.forEach(function(polygon, polyIdx) {
-          svgPaths.push(createPolygonPath(polygon, style, pathId + '_poly' + polyIdx, coordToSVG));
-        });
-      } else if (geomType === 'LineString') {
-        svgPaths.push(createLinePath(coords, style, pathId, coordToSVG));
-      } else if (geomType === 'MultiLineString') {
-        coords.forEach(function(line, lineIdx) {
-          svgPaths.push(createLinePath(line, style, pathId + '_line' + lineIdx, coordToSVG));
-        });
-      } else if (geomType === 'Point') {
-        svgPaths.push(createPointMarker(coords, style, pathId, coordToSVG));
-      } else if (geomType === 'MultiPoint') {
-        coords.forEach(function(point, ptIdx) {
-          svgPaths.push(createPointMarker(point, style, pathId + '_pt' + ptIdx, coordToSVG));
-        });
-      }
-    });
-  });
-  
-  // Aktuelles Datum
-  var now = new Date();
-  var dateStr = now.toLocaleDateString('de-DE') + ' ' + now.toLocaleTimeString('de-DE');
-  
-  // Generiere finales SVG
-  var svg = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  svg += '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgWidth + '" height="' + svgHeight + '" viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '">\n';
-  svg += '  <title>EMSR517 AOI15 - Rapid Mapping Export</title>\n';
-  svg += '  <defs>\n';
-  svg += '    <style>\n';
-  svg += '      text { font-family: Arial, sans-serif; fill: #333; }\n';
-  svg += '    </style>\n';
-  svg += '  </defs>\n';
-  svg += '  \n';
-  svg += '  <!-- Hintergrund -->\n';
-  svg += '  <rect width="' + svgWidth + '" height="' + svgHeight + '" fill="#f5f5f5"/>\n';
-  svg += '  \n';
-  svg += '  <!-- Layer -->\n';
-  svg += svgPaths.join('\n');
-  svg += '  \n';
-  svg += '  <!-- Titel -->\n';
-  svg += '  <text x="' + (svgWidth/2) + '" y="30" text-anchor="middle" font-weight="bold" font-size="20">\n';
-  svg += '    EMSR517 AOI15 - Ahrtal Flutkatastrophe\n';
-  svg += '  </text>\n';
-  svg += '  <text x="' + (svgWidth/2) + '" y="55" text-anchor="middle" font-size="14" fill="#666">\n';
-  svg += '    CEMS Rapid Mapping - Export ' + dateStr + '\n';
-  svg += '  </text>\n';
-  svg += '  \n';
-  svg += '  <!-- Koordinaten-Info -->\n';
-  svg += '  <text x="10" y="' + (svgHeight - 30) + '" font-size="12" fill="#888">\n';
-  svg += '    Koordinaten: ' + minLon.toFixed(4) + '°, ' + minLat.toFixed(4) + '° bis ' + maxLon.toFixed(4) + '°, ' + maxLat.toFixed(4) + '°\n';
-  svg += '  </text>\n';
-  svg += '  <text x="10" y="' + (svgHeight - 10) + '" font-size="12" fill="#888">\n';
-  svg += '    Zoom: ' + zoom + ' | Layer: ' + layers.length + ' | Aspect Ratio: ' + aspectRatio.toFixed(4) + '\n';
-  svg += '  </text>\n';
-  svg += '</svg>';
-  
-  return svg;
-}
-
-function createPolygonPath(coords, style, pathId, coordToSVG) {
-  var pathData = [];
-  
-  // Äußerer Ring
-  var outerRing = coords[0];
-  outerRing.forEach(function(coord, i) {
-    var pt = coordToSVG(coord[0], coord[1]);
-    if (i === 0) {
-      pathData.push('M ' + pt.x.toFixed(2) + ' ' + pt.y.toFixed(2));
-    } else {
-      pathData.push('L ' + pt.x.toFixed(2) + ' ' + pt.y.toFixed(2));
-    }
-  });
-  pathData.push('Z');
-  
-  // Innere Ringe (Löcher)
-  for (var h = 1; h < coords.length; h++) {
-    coords[h].forEach(function(coord, i) {
-      var pt = coordToSVG(coord[0], coord[1]);
-      if (i === 0) {
-        pathData.push('M ' + pt.x.toFixed(2) + ' ' + pt.y.toFixed(2));
-      } else {
-        pathData.push('L ' + pt.x.toFixed(2) + ' ' + pt.y.toFixed(2));
-      }
-    });
-    pathData.push('Z');
-  }
-  
-  var pathStr = pathData.join(' ');
-  var dashAttr = style.dashArray ? 'stroke-dasharray="' + style.dashArray + '"' : '';
-  
-  return '  <path id="' + pathId + '" d="' + pathStr + '" ' +
-         'fill="' + style.fillColor + '" fill-opacity="' + style.fillOpacity + '" ' +
-         'stroke="' + style.color + '" stroke-width="' + style.weight + '" ' +
-         'stroke-opacity="' + style.opacity + '" ' + dashAttr + ' ' +
-         'stroke-linejoin="round" stroke-linecap="round" />';
-}
-
-function createLinePath(coords, style, pathId, coordToSVG) {
-  var pathData = [];
-  
-  coords.forEach(function(coord, i) {
-    var pt = coordToSVG(coord[0], coord[1]);
-    if (i === 0) {
-      pathData.push('M ' + pt.x.toFixed(2) + ' ' + pt.y.toFixed(2));
-    } else {
-      pathData.push('L ' + pt.x.toFixed(2) + ' ' + pt.y.toFixed(2));
-    }
-  });
-  
-  var pathStr = pathData.join(' ');
-  var dashAttr = style.dashArray ? 'stroke-dasharray="' + style.dashArray + '"' : '';
-  
-  return '  <path id="' + pathId + '" d="' + pathStr + '" fill="none" ' +
-         'stroke="' + style.color + '" stroke-width="' + style.weight + '" ' +
-         'stroke-opacity="' + style.opacity + '" ' + dashAttr + ' ' +
-         'stroke-linecap="round" stroke-linejoin="round" />';
-}
-
-function createPointMarker(coords, style, pathId, coordToSVG) {
-  var pt = coordToSVG(coords[0], coords[1]);
-  var radius = 4;
-  
-  return '  <circle id="' + pathId + '" cx="' + pt.x.toFixed(2) + '" cy="' + pt.y.toFixed(2) + '" ' +
-         'r="' + radius + '" fill="' + style.fillColor + '" fill-opacity="' + style.fillOpacity + '" ' +
-         'stroke="' + style.color + '" stroke-width="' + style.weight + '" />';
-}
-
-function downloadSVG(svgContent) {
-  var now = new Date();
-  var filename = 'EMSR517_AOI15_Export_' + 
-                 now.getFullYear() + 
-                 ('0' + (now.getMonth() + 1)).slice(-2) + 
-                 ('0' + now.getDate()).slice(-2) + '_' +
-                 ('0' + now.getHours()).slice(-2) + 
-                 ('0' + now.getMinutes()).slice(-2) + 
-                 ('0' + now.getSeconds()).slice(-2) + 
-                 '.svg';
-  
-  var blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-  var url = URL.createObjectURL(blob);
-  
-  var link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  URL.revokeObjectURL(url);
-  
-  console.log('✅ SVG erfolgreich exportiert: ' + filename);
-}

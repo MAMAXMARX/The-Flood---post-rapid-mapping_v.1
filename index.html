@@ -6,9 +6,6 @@
   <title>Rapid Mapping - EMSR517; AOI15</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   
-  <!-- HINWEIS: leaflet-easyprint hat KEIN bundle.css - nur bundle.js! -->
-  <!-- Das CSS ist bereits im JS enthalten -->
-  
   <style>
     /* Set the map container size */
     #map {
@@ -27,15 +24,16 @@
     }
     
     /* ============================================ */
-    /* EASYPRINT BUTTON STYLING */
+    /* SVG EXPORT BUTTON STYLING */
     /* ============================================ */
-    .leaflet-control-easyPrint {
+    .leaflet-control-custom-svg-export {
       background-color: white;
       border-radius: 4px;
       box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+      margin-top: 10px;
     }
     
-    .leaflet-control-easyPrint a {
+    .leaflet-control-svg-export-button {
       background-color: white;
       width: 30px;
       height: 30px;
@@ -46,9 +44,10 @@
       color: black;
       font-size: 18px;
       border-radius: 4px;
+      cursor: pointer;
     }
     
-    .leaflet-control-easyPrint a:hover {
+    .leaflet-control-svg-export-button:hover {
       background-color: #f4f4f4;
     }
     
@@ -307,9 +306,6 @@
   <div id="map"></div>
   
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  
-  <!-- leaflet-easyprint - NUR das JS, kein CSS nötig! -->
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
   
   <!-- Zuerst die Daten-Funktionen laden -->
   <script src="RM11.08.21.js"></script>
