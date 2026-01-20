@@ -15,6 +15,13 @@ var layerGroups = {
   hydrography: L.layerGroup()
 };
 
+// ✅ Speichere alle Layer separat für effizientes Filtern
+var allLayersByGroup = {
+  buildings: [],
+  facilities: [],
+  transportation: []
+};
+
 function getFacilityStyle(damageGrade) {
   // Einheitliche Farbcodierung für Facilities (Polygone) wie bei Gebäuden
   switch(damageGrade) {
@@ -172,6 +179,9 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             
             var polygon = L.polygon(leafletCoords, polygonStyle);
             
+            // ✅ WICHTIG: Feature-Referenz speichern für späteres Filtern
+            polygon.feature = feature;
+            
             // Zu Gruppe hinzufügen basierend auf Notation oder targetGroup
             if (feature.properties && feature.properties.notation === 'Flooded area') {
               polygon.addTo(layerGroups.floodedArea);
@@ -179,6 +189,12 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
               polygon.addTo(layerGroups.floodTrace);
             } else if (targetGroup) {
               polygon.addTo(targetGroup);
+              // ✅ Speichere in Array für Filtern
+              if (targetGroup === layerGroups.buildings) {
+                allLayersByGroup.buildings.push(polygon);
+              } else if (targetGroup === layerGroups.facilities) {
+                allLayersByGroup.facilities.push(polygon);
+              }
             } else {
               polygon.addTo(map);
             }
@@ -234,9 +250,18 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
               weight: 1
             });
             
+            // ✅ WICHTIG: Feature-Referenz speichern für späteres Filtern
+            circleMarker.feature = feature;
+            
             // Zu entsprechender Gruppe hinzufügen basierend auf Schadensgrad
             if (targetGroup) {
               circleMarker.addTo(targetGroup);
+              // ✅ Speichere in Array für Filtern
+              if (targetGroup === layerGroups.buildings) {
+                allLayersByGroup.buildings.push(circleMarker);
+              } else if (targetGroup === layerGroups.facilities) {
+                allLayersByGroup.facilities.push(circleMarker);
+              }
             } else {
               circleMarker.addTo(map);
             }
@@ -278,8 +303,15 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             leafletCoords.forEach(function(lineCoords) {
               var polyline = L.polyline(lineCoords, lineStyle);
               
+              // ✅ WICHTIG: Feature-Referenz speichern für späteres Filtern
+              polyline.feature = feature;
+              
               if (targetGroup) {
                 polyline.addTo(targetGroup);
+                // ✅ Speichere in Array für Filtern
+                if (targetGroup === layerGroups.transportation) {
+                  allLayersByGroup.transportation.push(polyline);
+                }
               } else {
                 polyline.addTo(map);
               }
@@ -703,22 +735,55 @@ function createCustomLayerControl(map) {
           }
         }.bind(this));
       } else if (category === 'buildings') {
+        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         if (this.checked) {
           map.addLayer(layerGroups.buildings);
+          // ✅ Setze alle Subtype-Checkboxen auf checked
+          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
+            subCheckbox.checked = true;
+            subCheckbox.dispatchEvent(new Event('change'));
+          });
         } else {
           map.removeLayer(layerGroups.buildings);
+          // ✅ Setze alle Subtype-Checkboxen auf unchecked
+          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
+            subCheckbox.checked = false;
+            subCheckbox.dispatchEvent(new Event('change'));
+          });
         }
       } else if (category === 'facilities') {
+        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         if (this.checked) {
           map.addLayer(layerGroups.facilities);
+          // ✅ Setze alle Subtype-Checkboxen auf checked
+          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
+            subCheckbox.checked = true;
+            subCheckbox.dispatchEvent(new Event('change'));
+          });
         } else {
           map.removeLayer(layerGroups.facilities);
+          // ✅ Setze alle Subtype-Checkboxen auf unchecked
+          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
+            subCheckbox.checked = false;
+            subCheckbox.dispatchEvent(new Event('change'));
+          });
         }
       } else if (category === 'transportation') {
+        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         if (this.checked) {
           map.addLayer(layerGroups.transportation);
+          // ✅ Setze alle Subtype-Checkboxen auf checked
+          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
+            subCheckbox.checked = true;
+            subCheckbox.dispatchEvent(new Event('change'));
+          });
         } else {
           map.removeLayer(layerGroups.transportation);
+          // ✅ Setze alle Subtype-Checkboxen auf unchecked
+          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
+            subCheckbox.checked = false;
+            subCheckbox.dispatchEvent(new Event('change'));
+          });
         }
       } else if (category === 'flood') {
         var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
@@ -743,20 +808,35 @@ function createCustomLayerControl(map) {
       var type = this.getAttribute('data-type');
       var group = this.getAttribute('data-group');
       var checked = this.checked;
-      // Filtere alle Marker/Polygone im jeweiligen LayerGroup nach Schadensgrad
-      layerGroups[group].eachLayer(function(layer) {
+      
+      // ✅ Stelle sicher, dass die LayerGroup zur Karte hinzugefügt ist
+      if (!map.hasLayer(layerGroups[group])) {
+        map.addLayer(layerGroups[group]);
+      }
+      
+      // ✅ Verwende gespeicherte Layer-Arrays statt eachLayer
+      var layersToFilter = allLayersByGroup[group] || [];
+      
+      layersToFilter.forEach(function(layer) {
         if (
           layer.feature &&
           layer.feature.properties &&
           layer.feature.properties.damage_gra === type
         ) {
           if (checked) {
-            if (!map.hasLayer(layer)) map.addLayer(layer);
+            // Layer zur LayerGroup hinzufügen
+            if (!layerGroups[group].hasLayer(layer)) {
+              layerGroups[group].addLayer(layer);
+            }
           } else {
-            if (map.hasLayer(layer)) map.removeLayer(layer);
+            // Layer aus LayerGroup entfernen
+            if (layerGroups[group].hasLayer(layer)) {
+              layerGroups[group].removeLayer(layer);
+            }
           }
         }
       });
+      
       e.stopPropagation();
     });
   });
