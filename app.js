@@ -166,6 +166,43 @@ document.addEventListener('DOMContentLoaded', function () {
   setTimeout(function() { map.invalidateSize(); }, 100);
   
   // ============================================
+  // DYNAMISCHE HÖHE FÜR CUSTOM LAYER CONTROL
+  // Verhindert Überlappung mit Leaflet Control
+  // ============================================
+  
+  setTimeout(function() {
+    var customControl = document.querySelector('.custom-layer-control');
+    var leafletControl = document.querySelector('.leaflet-control-layers');
+    
+    if (customControl && leafletControl) {
+      function updateMaxHeight() {
+        var leafletRect = leafletControl.getBoundingClientRect();
+        var customRect = customControl.getBoundingClientRect();
+        
+        // Berechne maximale Höhe: Abstand vom Top bis zum Start des Leaflet Controls
+        var maxHeight = leafletRect.top - customRect.top - 10; // 10px Abstand
+        
+        if (maxHeight > 200) { // Mindesthöhe
+          customControl.style.maxHeight = maxHeight + 'px';
+        }
+      }
+      
+      updateMaxHeight();
+      window.addEventListener('resize', updateMaxHeight);
+      
+      console.log('✅ Dynamische Höhenberechnung aktiviert');
+    }
+  }, 1000);
+  
+  // ============================================
+  // ORTSCHAFTEN CONTROL (RECHTE SEITE)
+  // ============================================
+  
+  if (typeof createOrtschaftenControl === 'function') {
+    createOrtschaftenControl(map);
+  }
+  
+  // ============================================
   // SVG EXPORT - Funktionen bleiben verfügbar
   // Button wurde entfernt aus Interface
   // ============================================
@@ -173,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
   console.log('✓ Karte geladen mit allen Features');
   console.log('🎨 Esri Satellit & Monochrome aktiv');
   console.log('📖 Legende ein-/ausblendbar');
+  console.log('📍 Ortschaften-Navigation rechts');
   console.log('🚫 Zoom Control & SVG Export Button entfernt');
 });
 

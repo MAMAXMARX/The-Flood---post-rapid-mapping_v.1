@@ -57,9 +57,10 @@
       padding: 12px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      max-width: 300px;
-      max-height: 85vh;
+      width: 300px;
+      max-height: calc(100vh - 200px); /* Genug Platz für Leaflet Control */
       overflow-y: auto;
+      overflow-x: hidden;
       font-family: Arial, sans-serif;
       font-size: 12px;
     }
@@ -215,6 +216,7 @@
       border-radius: 5px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       padding: 8px;
+      width: 300px; /* Gleiche Breite wie Custom Layer Control */
     }
     
     .leaflet-control-layers label {
@@ -272,11 +274,17 @@
     .leaflet-top.leaflet-left {
       margin-top: 10px;
       margin-left: 10px;
+      max-width: 300px; /* Feste Breite */
     }
     
     /* Abstand zwischen Custom Layer Control und Layer Control */
     .leaflet-top.leaflet-left .custom-layer-control {
       margin-bottom: 10px;
+    }
+    
+    /* Leaflet Control sollte auch links ausgerichtet sein */
+    .leaflet-control-layers {
+      margin-left: 0 !important;
     }
     
     /* Scrollbar für Legende */
@@ -296,6 +304,78 @@
     
     .custom-layer-control::-webkit-scrollbar-thumb:hover {
       background: #555;
+    }
+    
+    /* ============================================ */
+    /* ORTSCHAFTEN CONTROL - RECHTE SEITE */
+    /* ============================================ */
+    
+    .ortschaften-control {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      width: 200px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    
+    .ortschaften-header {
+      border-bottom: 2px solid #0066cc;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      text-align: center;
+      color: #0066cc;
+    }
+    
+    .ortschaften-header strong {
+      font-size: 14px;
+    }
+    
+    .ortschaften-liste {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .ortschaften-item {
+      padding: 6px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      font-size: 11px;
+    }
+    
+    .ortschaften-item:hover {
+      background: #e3f2fd;
+      color: #0066cc;
+      font-weight: 500;
+    }
+    
+    .ortschaften-control::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .ortschaften-control::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    .ortschaften-control::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 3px;
+    }
+    
+    .ortschaften-control::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    
+    /* Position rechts oben */
+    .leaflet-top.leaflet-right {
+      margin-top: 10px;
+      margin-right: 10px;
     }
     
     @media (max-width: 768px) {
@@ -318,6 +398,9 @@
   
   <!-- Layer.js für Hochwasserlinie -->
   <script src="Layer.js"></script>
+  
+  <!-- Ortschaften Control für Navigation -->
+  <script src="Ortschaften.js"></script>
   
   <!-- Dann die Hauptanwendung -->
   <script src="app.js"></script>
