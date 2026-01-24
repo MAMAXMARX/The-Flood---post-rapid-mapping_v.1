@@ -223,7 +223,7 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
     <div class="legend-section-compact">
       <label class="legend-item-compact">
         <input type="checkbox" class="layer-toggle" data-layer="aoi_19_07" data-date="19_07">
-        <span class="layer-name">Untersuchungsgebiet</span>
+        <span class="layer-name">Untersuchungsgebiet - AoI15</span>
         <span class="legend-symbol-small" style="border: 2px solid #000000; box-shadow: inset 0 0 0 1px #ffffff; background: transparent;"></span>
       </label>
     </div>

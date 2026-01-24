@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   
-  // Neue Koordinaten & Zoom 15
-  var map = L.map('map').setView([50.47296726489117, 6.954176637076611], 11);
+  // Neue Koordinaten & Zoom 15 - Zoom Control deaktiviert
+  var map = L.map('map', {
+    zoomControl: false  // ✅ Zoom Control entfernt
+  }).setView([50.47296726489117, 6.954176637076611], 15);
 
   // ============================================
   // VERSCHIEDENE KARTENANSICHTEN (BASE LAYERS)
@@ -164,40 +166,14 @@ document.addEventListener('DOMContentLoaded', function () {
   setTimeout(function() { map.invalidateSize(); }, 100);
   
   // ============================================
-  // CLIENT-SIDE SVG EXPORT
+  // SVG EXPORT - Funktionen bleiben verfügbar
+  // Button wurde entfernt aus Interface
   // ============================================
-  
-  var SvgExportControl = L.Control.extend({
-    options: { position: 'topleft' },
-    onAdd: function(map) {
-      var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom-svg-export');
-      var button = L.DomUtil.create('a', 'leaflet-control-svg-export-button', container);
-      button.href = '#';
-      button.title = 'Sichtbare Layer als SVG exportieren';
-      button.innerHTML = '📥';
-      button.style.fontSize = '18px';
-      button.style.width = '30px';
-      button.style.height = '30px';
-      button.style.lineHeight = '30px';
-      button.style.textAlign = 'center';
-      button.style.display = 'block';
-      button.style.backgroundColor = 'white';
-      button.style.color = 'black';
-      button.style.textDecoration = 'none';
-      L.DomEvent.on(button, 'click', function(e) {
-        L.DomEvent.preventDefault(e);
-        exportVisibleLayersAsSVG(map);
-      });
-      return container;
-    }
-  });
-  
-  map.addControl(new SvgExportControl());
   
   console.log('✓ Karte geladen mit allen Features');
   console.log('🎨 Esri Satellit & Monochrome aktiv');
   console.log('📖 Legende ein-/ausblendbar');
-  console.log('📥 SVG-Export verfügbar');
+  console.log('🚫 Zoom Control & SVG Export Button entfernt');
 });
 
 function exportVisibleLayersAsSVG(map) {

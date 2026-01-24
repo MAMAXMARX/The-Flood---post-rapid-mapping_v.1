@@ -113,29 +113,37 @@ function addUESGToLegend(map) {
   setTimeout(function() {
     var legendControl = document.querySelector('.custom-layer-control');
     if (!legendControl) {
-      console.warn('[UESG] Keine Legende gefunden');
+      console.warn('[UESG] Keine Legende gefunden - versuche erneut...');
+      // Versuche nochmal nach weiteren 500ms
+      setTimeout(function() {
+        var legendControl2 = document.querySelector('.custom-layer-control');
+        if (!legendControl2) {
+          console.error('[UESG] Legende immer noch nicht gefunden!');
+          return;
+        }
+        addUESGSectionToControl(legendControl2, map);
+      }, 500);
       return;
     }
     
+    addUESGSectionToControl(legendControl, map);
+  }, 800);
+}
+
+function addUESGSectionToControl(legendControl, map) {
+  try {
     // Erstelle neue Sektion fuer Ueberschwemmungsgebiet
     var uesgSection = document.createElement('div');
     uesgSection.className = 'legend-date-section';
     uesgSection.innerHTML = `
-      <div class="legend-date-header" style="background: #e3f2fd;">
-        <span class="section-toggle-icon" id="uesg-toggle">▼</span>
-        <div class="date-header-content">
-          <strong style="color: #0066cc;">Ueberschwemmungsgebiet Ahr</strong>
+      <div class="legend-date-header" style="background: #e3f2fd; display: flex; align-items: center;">
+        <div class="date-header-content" style="flex: 1;">
+          <strong style="color: #0066cc;">Jahrhunderthochwasser - Erwartetes Überschwemmungsgebiet</strong>
           <small style="color: #0066cc;">Vorlaeufig sichergestellt (Par.76 Abs. 3 WHG)</small>
         </div>
+        <input type="checkbox" id="uesg-toggle-checkbox" style="width: 16px; height: 16px; margin-left: 8px; cursor: pointer;">
       </div>
-      <div class="legend-date-content" id="uesg-content">
-        <div class="legend-item-compact">
-          <input type="checkbox" id="uesg-toggle-checkbox">
-          <label for="uesg-toggle-checkbox" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-            <span class="legend-symbol-small" style="background: linear-gradient(135deg, #0099ff 0%, #0066cc 100%); border: 2px solid #0066cc;"></span>
-            <span class="layer-name">Hochwasserlinie 2021</span>
-          </label>
-        </div>
+      <div class="legend-date-content" id="uesg-content" style="display: none;">
         <div style="margin-top: 8px; padding: 6px; background: #f5f5f5; border-radius: 4px; font-size: 10px; color: #555;">
           <strong>Hinweis:</strong><br>
           Zeigt die vorlaeufig sichergestellte Ueberschwemmungsflaeche der Ahrtal-Flut vom Juli 2021.<br><br>
@@ -153,24 +161,7 @@ function addUESGToLegend(map) {
       legendControl.appendChild(uesgSection);
     }
     
-    // Event Listener fuer Toggle-Icon
-    var headerElement = uesgSection.querySelector('.legend-date-header');
-    var toggleIcon = document.getElementById('uesg-toggle');
-    var toggleContent = document.getElementById('uesg-content');
-    
-    if (headerElement && toggleIcon && toggleContent) {
-      headerElement.addEventListener('click', function() {
-        if (toggleContent.style.display === 'none') {
-          toggleContent.style.display = 'block';
-          toggleIcon.textContent = '▼';
-        } else {
-          toggleContent.style.display = 'none';
-          toggleIcon.textContent = '▶';
-        }
-      });
-    }
-    
-    // Event Listener fuer Checkbox
+    // Event Listener fuer Checkbox (Layer ein-/ausschalten)
     var checkbox = document.getElementById('uesg-toggle-checkbox');
     if (checkbox) {
       checkbox.addEventListener('change', function() {
@@ -200,7 +191,9 @@ function addUESGToLegend(map) {
     }
     
     console.log('[UESG] Legende erfolgreich erstellt');
-  }, 800);
+  } catch (error) {
+    console.error('[UESG] Fehler beim Hinzufügen zur Legende:', error);
+  }
 }
 
 // Exportiere die Hauptfunktion

@@ -504,15 +504,12 @@ function loadRapidMappingData(map, allLayers) {
 function createCustomLayerControl(map) {
   var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
   controlDiv.innerHTML = `
-    <div class="legend-main-header">
-      <strong>CEMS RAPID MAPPING EMSR517 - AOI15 Einschätzung der Flutkatastrophe im Ahrtal</strong>
-    </div>
     <div class="legend-date-section">
       <div class="legend-date-header" data-section="19_07">
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
-          <strong>Ortssituation am 18/07/2021, 10:50 Uhr</strong>
-          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
+          <strong>CEMS Rapid Mapping EMSR517 - 18/07/2021, 10:50 Uhr</strong>
+          <small style="display:block;">Aktivierung: 13/07/2021, 17:11 Uhr</small>
           <small style="display:block;">Kartierung: 19/07/2021</small>
         </div>
         <input type="checkbox" class="section-layer-toggle" data-section="19_07" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
@@ -523,8 +520,8 @@ function createCustomLayerControl(map) {
       <div class="legend-date-header" data-section="11_08">
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content">
-          <strong>Ortssituation am 20/07/2021, 10:35 Uhr</strong>
-          <small style="display:block;">Aktivierung: 13/07/2021, 17:11</small>
+          <strong>CEMS Rapid Mapping EMSR517 - 20/07/2021, 10:35 Uhr</strong>
+          <small style="display:block;">Aktivierung: 13/07/2021, 17:11 Uhr</small>
           <small style="display:block;">Kartierung: 11/08/2021</small>
         </div>
         <input type="checkbox" class="section-layer-toggle" data-section="11_08" title="Alle Layer dieser Sektion ein-/ausblenden" style="margin-left:8px; width:16px; height:16px;">
@@ -541,7 +538,7 @@ function createCustomLayerControl(map) {
           <div class="legend-subcategory-compact" data-category="aoi">
             <label class="legend-item-compact">
               <input type="checkbox" class="layer-toggle" data-layer="aoi" data-date="11_08" checked>
-              <span class="layer-name">Untersuchungsgebiet</span>
+              <span class="layer-name">Untersuchungsgebiet - AoI15</span>
               <span class="legend-symbol-small" style="border: 2px solid #7e0909ff; background: transparent;"></span>
             </label>
             <label class="legend-item-compact">
@@ -869,22 +866,37 @@ function createCustomLayerControl(map) {
     header.addEventListener('click', function(e) {
       // Nicht ausklappen, wenn auf die Section-Layer-Toggle-Checkbox geklickt wurde
       if (e.target.classList.contains('section-layer-toggle')) return;
+      // Nicht ausklappen, wenn direkt auf Checkbox (UESG) geklickt wurde
+      if (e.target.id === 'uesg-toggle-checkbox') return;
+      
       var section = this.getAttribute('data-section');
       var content = controlDiv.querySelector(`[data-section-content="${section}"]`);
       var icon = this.querySelector('.section-toggle-icon');
-      if (content.style.display === 'none') {
+      
+      if (content && content.style.display === 'none') {
+        // ✅ Beim Aufklappen: Alle Subcategories innerhalb dieser Section einklappen
         content.style.display = 'block';
-        icon.textContent = '▼';
-      } else {
+        if (icon) icon.textContent = '▼';
+        
+        // Alle Subcategories einklappen
+        content.querySelectorAll('.legend-subcategory-compact').forEach(function(subcat) {
+          subcat.style.display = 'none';
+        });
+        
+        // Alle Toggle-Icons auf ▶ setzen
+        content.querySelectorAll('.toggle-icon-small').forEach(function(toggleIcon) {
+          toggleIcon.textContent = '▶';
+        });
+      } else if (content) {
         content.style.display = 'none';
-        icon.textContent = '▶';
+        if (icon) icon.textContent = '▶';
       }
     });
   });
 
   var CustomControl = L.Control.extend({
     options: {
-      position: 'topright'
+      position: 'topleft'  // ✅ Links statt rechts
     },
     onAdd: function(map) {
       return controlDiv;
@@ -927,18 +939,3 @@ function addLayerWithHierarchy(map) {
   if (map.hasLayer(layerGroups.transportation)) map.addLayer(layerGroups.transportation);
   if (map.hasLayer(layerGroups.buildings)) map.addLayer(layerGroups.buildings);
 }
-
-// Beispiel: Im Event-Listener für Checkboxen nach dem Hinzufügen/Entfernen:
-controlDiv.querySelectorAll('.layer-toggle[data-date="11_08"]').forEach(function(checkbox) {
-  checkbox.addEventListener('change', function() {
-    var layerName = this.getAttribute('data-layer');
-    if (this.checked) {
-      map.addLayer(layerGroups[layerName]);
-    } else {
-      map.removeLayer(layerGroups[layerName]);
-    }
-    addLayerWithHierarchy(map);
-  });
-});
-
-// Gleiches Prinzip für Kategorie-Toggles und Section-Toggles anwenden
