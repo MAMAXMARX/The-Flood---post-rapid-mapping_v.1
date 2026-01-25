@@ -136,19 +136,19 @@ function addUESGSectionToControl(legendControl, map) {
     var uesgSection = document.createElement('div');
     uesgSection.className = 'legend-date-section';
     uesgSection.innerHTML = `
-      <div class="legend-date-header" style="background: #e3f2fd; display: flex; align-items: center;">
-        <div class="date-header-content" style="flex: 1;">
-          <strong style="color: #0066cc;">Jahrhunderthochwasser - Erwartetes Überschwemmungsgebiet</strong>
-          <small style="color: #0066cc;">Vorlaeufig sichergestellt (Par.76 Abs. 3 WHG)</small>
+      <div class="legend-date-header" style="background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; color: #ffffff;">
+        <div class="date-header-content" style="flex: 1; color: #ffffff;">
+          <strong style="color: #ffffff;">Jahrhunderthochwasser - Erwartetes Überschwemmungsgebiet</strong>
+          <small style="color: #dddddd;">Vorlaeufig sichergestellt (Par.76 Abs. 3 WHG)</small>
         </div>
         <input type="checkbox" id="uesg-toggle-checkbox" style="width: 16px; height: 16px; margin-left: 8px; cursor: pointer;">
       </div>
-      <div class="legend-date-content" id="uesg-content" style="display: none;">
-        <div style="margin-top: 8px; padding: 6px; background: #f5f5f5; border-radius: 4px; font-size: 10px; color: #555;">
-          <strong>Hinweis:</strong><br>
+      <div class="legend-date-content" id="uesg-content" style="display: none; background: rgba(0, 0, 0, 0.3);">
+        <div style="margin-top: 8px; padding: 6px; background: rgba(0, 0, 0, 0.5); border-radius: 4px; font-size: 10px; color: #dddddd; border: 1px solid #ffffff;">
+          <strong style="color: #ffffff;">Hinweis:</strong><br>
           Zeigt die vorlaeufig sichergestellte Ueberschwemmungsflaeche der Ahrtal-Flut vom Juli 2021.<br><br>
-          <strong>Datenquelle:</strong> <a href="https://sgdnord.rlp.de" target="_blank" style="color: #0066cc;">SGD Nord RLP</a> / 
-          <a href="https://www.geoportal.rlp.de" target="_blank" style="color: #0066cc;">Geoportal RLP</a>
+          <strong style="color: #ffffff;">Datenquelle:</strong> <a href="https://sgdnord.rlp.de" target="_blank" style="color: #47a9bc;">SGD Nord RLP</a> / 
+          <a href="https://www.geoportal.rlp.de" target="_blank" style="color: #47a9bc;">Geoportal RLP</a>
         </div>
       </div>
     `;

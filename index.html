@@ -53,10 +53,11 @@
     
     /* Custom Layer Control Styling */
     .custom-layer-control {
-      background: rgba(255, 255, 255, 0);
-      padding: 12px;
-      border-radius: 8px;
-      box-shadow: 0 0px 0px rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.741); /* Schwarzer Hintergrund wie Ortschaften */
+      padding: 0; /* Kein Padding - Headers füllen volle Breite */
+      border-radius: 1px; /* Eckig wie Ortschaften */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid #ffffff; /* Weißer Rand */
       width: 300px;
       max-height: calc(100vh - 200px); /* Genug Platz für Leaflet Control */
       overflow-y: auto;
@@ -78,50 +79,64 @@
     }
     
     .legend-date-section {
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      margin-bottom: 0; /* Kein Abstand zwischen Sections */
+      border: none; /* Kein Rand um Section */
+      border-bottom: 2px solid #ffffff; /* Nur unten weißer Rand als Trenner */
+      border-radius: 0; /* Keine runden Ecken */
       overflow: hidden;
+      background: rgba(0, 75, 90, 0.557); /* Dunkler Hintergrund */
+    }
+    
+    .legend-date-section:last-child {
+      border-bottom: none; /* Letzte Section ohne unteren Rand */
     }
     
     .legend-date-header {
-      background: #f5f5f5;
-      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 8px 12px; /* Padding nur innen */
+      margin: 0; /* Kein Margin */
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #ffffff;
       user-select: none;
+      color: #ffffff; /* Weiße Schrift */
+      width: 100%; /* Volle Breite */
+      box-sizing: border-box;
     }
     
     .legend-date-header:hover {
-      background: #e8e8e8;
+      background: rgba(71, 169, 188, 0.557); /* Cyan Hover wie Ortschaften */
     }
     
     .section-toggle-icon {
       font-size: 10px;
       min-width: 15px;
       display: inline-block;
+      color: #ffffff; /* Weiß */
     }
     
     .date-header-content {
       flex: 1;
+      color: #ffffff; /* Weiß */
     }
     
     .date-header-content strong {
       font-size: 13px;
       display: block;
       margin-bottom: 2px;
+      color: #ffffff;
     }
     
     .date-header-content small {
       font-size: 10px;
-      color: #666;
+      color: #dddddd; /* Hellgrau */
     }
     
     .legend-date-content {
-      padding: 8px;
+      padding: 12px; /* Padding für Inhalt */
+      background: rgba(0, 0, 0, 0.3); /* Halbtransparent schwarz */
     }
     
     .legend-section-compact {
@@ -135,23 +150,25 @@
       cursor: pointer;
       padding: 3px 0;
       user-select: none;
+      color: #ffffff; /* Weiß */
     }
     
     .legend-category-compact:hover {
-      background: #f0f0f0;
+      background: rgba(71, 169, 188, 0.3); /* Cyan Hover */
     }
     
     .toggle-icon-small {
       font-size: 9px;
       width: 12px;
       display: inline-block;
+      color: #ffffff;
     }
     
     .legend-subcategory-compact {
       margin-left: 20px;
       margin-top: 4px;
       padding-left: 8px;
-      border-left: 2px solid #ddd;
+      border-left: 2px solid #ffffff; /* Weißer Rand */
     }
     
     .legend-item-compact {
@@ -161,15 +178,17 @@
       padding: 2px 0;
       cursor: pointer;
       font-size: 11px;
+      color: #ffffff; /* Weiß */
     }
     
     .legend-item-compact:hover {
-      background: #f9f9f9;
+      background: rgba(71, 169, 188, 0.3); /* Cyan Hover */
     }
     
     .layer-name {
       flex: 1;
       font-size: 11px;
+      color: #ffffff;
     }
     
     .legend-symbol-small {
@@ -180,16 +199,17 @@
     }
     
     .legend-info-compact {
-      background: #f5f5f5;
+      background: rgba(0, 0, 0, 0.5);
       padding: 6px;
       border-radius: 4px;
       margin-top: 10px;
       text-align: center;
+      border: 1px solid #ffffff;
     }
     
     .legend-info-compact small {
       font-size: 10px;
-      color: #555;
+      color: #dddddd; /* Hellgrau */
     }
     
     .custom-layer-control input[type="checkbox"] {
@@ -297,7 +317,7 @@
     }
     
     .custom-layer-control::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: #00000070; /* Dunkler Track wie Ortschaften */
       border-radius: 3px;
     }
     
