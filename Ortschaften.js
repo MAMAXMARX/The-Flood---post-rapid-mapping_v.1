@@ -8,7 +8,7 @@ var ortschaften = [
   { name: "Altenburg", lat: 50.510738708680414, lon: 6.987212599234379, zoom: 16 },
   { name: "Antweiler", lat: 50.406247945467776, lon: 6.831230162425697, zoom: 15 },
   { name: "Bachem", lat: 50.53996769301483, lon: 7.112306853918992, zoom: 16 },
-  { name: "Bad Bollendorf", lat: 49.8561, lon: 6.3539, zoom: 15 },
+  { name: "Bad Bodendorf", lat: 50.557565104277415, lon: 7.216834588965766, zoom: 15 },
   { name: "Bad Neuenahr-Ahrweiler", lat: 50.5428, lon: 7.1250, zoom: 14 },
   { name: "Dernau", lat: 50.53442999116984, lon: 7.04431406834209, zoom: 15 },
   { name: "Dorsel", lat: 50.379109566662365, lon: 6.7925836315394985, zoom: 15 },
@@ -59,7 +59,7 @@ function createOrtschaftenControl(map) {
           map.setView([ort.lat, ort.lon], ort.zoom);
           
           // Kurzes Highlight
-          item.style.backgroundColor = '#0066cc';
+          item.style.backgroundColor = '#000000';
           item.style.color = 'white';
           setTimeout(function() {
             item.style.backgroundColor = '';

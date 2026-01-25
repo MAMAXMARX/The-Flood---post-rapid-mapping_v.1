@@ -180,17 +180,22 @@ document.addEventListener('DOMContentLoaded', function () {
         var customRect = customControl.getBoundingClientRect();
         
         // Berechne maximale Höhe: Abstand vom Top bis zum Start des Leaflet Controls
-        var maxHeight = leafletRect.top - customRect.top - 10; // 10px Abstand
+        var maxHeight = leafletRect.top - customRect.top - 20; // 20px Abstand
         
         if (maxHeight > 200) { // Mindesthöhe
           customControl.style.maxHeight = maxHeight + 'px';
         }
+        
+        // Debug: Überprüfe Alignment
+        console.log('Custom Control left:', customRect.left);
+        console.log('Leaflet Control left:', leafletRect.left);
+        console.log('Gap:', leafletRect.top - (customRect.top + customRect.height));
       }
       
       updateMaxHeight();
       window.addEventListener('resize', updateMaxHeight);
       
-      console.log('✅ Dynamische Höhenberechnung aktiviert');
+      console.log('✅ Dynamische Höhenberechnung aktiviert (20px Gap)');
     }
   }, 1000);
   

@@ -53,16 +53,17 @@
     
     /* Custom Layer Control Styling */
     .custom-layer-control {
-      background: white;
+      background: rgba(255, 255, 255, 0);
       padding: 12px;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 0px 0px rgba(0,0,0,0.3);
       width: 300px;
       max-height: calc(100vh - 200px); /* Genug Platz für Leaflet Control */
       overflow-y: auto;
       overflow-x: hidden;
       font-family: Arial, sans-serif;
       font-size: 12px;
+      box-sizing: border-box; /* Padding inbegriffen in width */
     }
     
     .legend-main-header {
@@ -279,12 +280,15 @@
     
     /* Abstand zwischen Custom Layer Control und Layer Control */
     .leaflet-top.leaflet-left .custom-layer-control {
-      margin-bottom: 10px;
+      margin-bottom: 20px; /* 20px Gap zwischen Controls */
+      margin-left: 0; /* Kein zusätzlicher Margin */
     }
     
-    /* Leaflet Control sollte auch links ausgerichtet sein */
+    /* Leaflet Control exakt ausrichten */
     .leaflet-control-layers {
-      margin-left: 0 !important;
+      margin-left: 10 !important;
+      margin-right: 0 !important;
+      box-sizing: border-box; /* Padding inbegriffen */
     }
     
     /* Scrollbar für Legende */
@@ -311,11 +315,11 @@
     /* ============================================ */
     
     .ortschaften-control {
-      background: white;
+      background: rgba(0, 0, 0, 0.741);
       padding: 12px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      width: 200px;
+      width: 140px;
       max-height: 400px;
       overflow-y: auto;
       font-family: Arial, sans-serif;
@@ -323,21 +327,23 @@
     }
     
     .ortschaften-header {
-      border-bottom: 2px solid #0066cc;
+      border-bottom: 2px solid #ffffff;
       padding-bottom: 8px;
       margin-bottom: 8px;
-      text-align: center;
-      color: #0066cc;
+      text-align: left;
+      color: #ffffff;
     }
     
     .ortschaften-header strong {
-      font-size: 14px;
+      font-size: 12px;
     }
     
     .ortschaften-liste {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
+      color: #ffffff;
+
     }
     
     .ortschaften-item {
@@ -349,8 +355,8 @@
     }
     
     .ortschaften-item:hover {
-      background: #e3f2fd;
-      color: #0066cc;
+      background: #47a9bc8e;
+      color: #ffffff;
       font-weight: 500;
     }
     
@@ -359,7 +365,7 @@
     }
     
     .ortschaften-control::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: #00000070;
       border-radius: 3px;
     }
     
