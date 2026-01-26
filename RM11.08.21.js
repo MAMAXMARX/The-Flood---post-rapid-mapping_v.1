@@ -514,12 +514,77 @@ function loadRapidMappingData(map, allLayers) {
 
 // Erweiterte Layer Control mit Hierarchie erstellen
 function createCustomLayerControl(map) {
-  // Erstelle Container für Titel
+  // Erstelle Container für Titel mit Info-Icon
   var titleDiv = L.DomUtil.create('div', 'legend-title-container');
   titleDiv.innerHTML = `
-    <div style="font-size: 26px; font-weight: bold; color: #47a9bc; line-height: 1.3;">The Flood</div>
-    <div style="font-size: 18px; font-weight: bold; color: #ffffff; line-height: 1.3;">[Post-] Rapid Mapping a Crisis</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div style="font-size: 18px; font-weight: bold; color: #47a9bc; line-height: 1.3;">The Flood</div>
+        <div style="font-size: 18px; font-weight: bold; color: #ffffff; line-height: 1.3;">[Post-] Rapid Mapping a Crisis</div>
+      </div>
+      <button id="info-button" style="background: transparent; border: 2px solid #ffffff; color: #ffffff; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; padding: 0; flex-shrink: 0; margin-top: 2px;" title="Über das Projekt">ℹ</button>
+    </div>
   `;
+  
+  // Info-Modal HTML
+  var modalHTML = `
+    <div id="info-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); z-index: 10000; overflow-y: auto;">
+      <div style="max-width: 800px; margin: 40px auto; background: rgba(0, 0, 0, 0.7); border: 2px solid #ffffff; border-radius: 1px; padding: 140px; position: relative; color: #ffffff; font-family: Arial, sans-serif;">
+        <button id="close-modal" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #ffffff; font-size: 24px; cursor: pointer; font-weight: bold; line-height: 1;">×</button>
+        
+        <h2 style="text-align: center; font-weight: bold; color: #47a9bc; font-size: 20px; margin-bottom: 20px;">ÜBER DAS PROJEKT</h2>
+        
+        <p style="text-align: justify; font-size: 12px; line-height: 1.6; margin-bottom: 30px; color: #ffffff;">
+          «The Flood – [Post-] Rapid Mapping a Crisis» bereitet die gesammelten (Geo-) Daten in Form einer webbasierten, interaktiven Karte auf und dokumentiert den Einsatz des Copernicus Emergency Management Service (CEMS) während der Flutkatastrophe im Ahrtal im Juni 2021. Die gesammelten Datensätze ermöglichen als operatives Bild eine mutmaßliche Einschätzung des Schadensausmaßes entlang der Ahr im Verlaufe der Katastrophe.
+        </p>
+        
+        <h2 style="text-align: center; font-weight: bold; color: #47a9bc; font-size: 20px; margin-bottom: 20px;">RAPID MAPPING</h2>
+        
+        <p style="text-align: justify; font-size: 12px; line-height: 1.6; color: #ffffff;">
+          «Rapid Mapping» bezeichnet die schnelle Bereitstellung räumlicher bzw. geowissenschaftlicher Informationen, beispielsweise auf Basis von Satelliten- oder Luftbildern, zur Unterstützung bei der Notfall-, Krisen- oder Schadensbewältigung. Im Kontext der Flutkatastrophe im Ahrtal im Juni 2021 kam der europäische Dienst Copernicus Emergency Management Service (CEMS) zum Einsatz. Dieser bietet in Krisen- und Katastrophenfällen Satelliten- und Geodaten an, um einen ersten Überblick über das Schadensausmaß verschiedener betroffener Ortschaften zu ermöglichen. Auf Grundlage der Satellitendaten der Flutkatastrophe führte der CEMS eine umfassende Schadensauswertung in Kartenform durch und veröffentlichte die Ergebnisse in verschiedenen Formaten. Die Auswertungen gliederten sich in sogenannte «Delineation Products», welche die Ausdehnung der Überflutungsgebiete darstellen, sowie in «Grading Products», die das Ausmaß der Schäden an Gebäuden und Infrastruktur erfassen. Die vom Copernicus EMS erstellten Produkte waren über mindestens einen Monat hinweg ein zentraler Bestandteil der Analysen im Landesamt für Umwelt (LfU) und dienten insbesondere zur Ermittlung von Überflutungsflächen und zerstörter Infrastruktur wie Brücken und Gebäuden.
+        </p>
+      </div>
+    </div>
+  `;
+  
+  // Füge Modal zum Body hinzu
+  setTimeout(function() {
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Event Listener für Info-Button
+    var infoButton = document.getElementById('info-button');
+    var modal = document.getElementById('info-modal');
+    var closeButton = document.getElementById('close-modal');
+    
+    if (infoButton && modal) {
+      infoButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        modal.style.display = 'block';
+      });
+    }
+    
+    if (closeButton && modal) {
+      closeButton.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+    }
+    
+    // Schließen beim Klick außerhalb des Modal-Inhalts
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    }
+    
+    // Schließen mit ESC-Taste
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal && modal.style.display === 'block') {
+        modal.style.display = 'none';
+      }
+    });
+  }, 100);
   
   // Erstelle Layer Control
   var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
