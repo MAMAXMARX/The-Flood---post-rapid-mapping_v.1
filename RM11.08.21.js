@@ -72,15 +72,15 @@ function getDamageColor(damageGrade) {
 function getFloodStyle(notation) {
   if (notation === 'Flooded area') {
     return {
-      color: '#1b00ccff',
-      fillColor: '#056bd2ff',
-      fillOpacity: 0.5,
-      weight: 2
+      color: 'rgb(0, 54, 92)',
+      fillColor: 'rgb(34, 84, 224)',
+      fillOpacity: 0.3,
+      weight: 1
     };
   } else if (notation === 'Flood trace') {
     return {
       color: '#03484eff',
-      fillColor: '#00dddd71',
+      fillColor: '#0087c1',
       fillOpacity: 0.3,
       weight: 1
     };
@@ -457,8 +457,8 @@ function loadRapidMappingData(map, allLayers) {
       color: '#999999',
       weight: 1,
       opacity: 0.8,
-      fillColor: '#cccccc',
-      fillOpacity: 0.3,
+      fillColor: '#ffffff7a',
+      fillOpacity: 0.6,
       dashArray: '4, 4'
     },
     'Nicht analysierte Bereiche',
@@ -472,7 +472,7 @@ function loadRapidMappingData(map, allLayers) {
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyL_r1_v3.json',
     {
-      color: '#0066cc',
+      color: '#00172f',
       weight: 2,
       opacity: 0.7
     },
@@ -487,10 +487,10 @@ function loadRapidMappingData(map, allLayers) {
   loadGeoJSON(
     './11.08.2021_EMSR517_json/EMSR517_AOI15_GRA_MONIT01_hydrographyA_r1_v3.json',
     {
-      color: '#0066cc',
-      fillColor: '#6699cc',
+      color: '#00172f',
+      fillColor: '#0054a9',
       fillOpacity: 0.4,
-      weight: 1
+      weight: 2
     },
     'Gewässer',
     'Hydrography Areas',
@@ -558,17 +558,17 @@ function createCustomLayerControl(map) {
           </div>
           <div class="legend-subcategory-compact" data-category="buildings">
             <label class="legend-item-compact">
-              <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="buildings" data-date="11_08" checked>
+              <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="combined" data-date="11_08" checked>
               <span class="layer-name">Mögl. beschädigt</span>
               <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
             </label>
             <label class="legend-item-compact">
-              <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="buildings" data-date="11_08" checked>
+              <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="combined" data-date="11_08" checked>
               <span class="layer-name">Beschädigt</span>
               <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
             </label>
             <label class="legend-item-compact">
-              <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="buildings" data-date="11_08" checked>
+              <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="combined" data-date="11_08" checked>
               <span class="layer-name">Zerstört</span>
               <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
             </label>
@@ -578,34 +578,8 @@ function createCustomLayerControl(map) {
           <div class="legend-category-compact">
             <span class="toggle-icon-small">▼</span>
             <label style="flex:1;">
-              <input type="checkbox" class="category-toggle" data-category="facilities" data-date="11_08" checked>
-              <strong>Infrastruktur</strong>
-            </label>
-          </div>
-          <div class="legend-subcategory-compact" data-category="facilities">
-            <label class="legend-item-compact">
-              <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="facilities" data-date="11_08" checked>
-              <span class="layer-name">Mögl. beschädigt</span>
-              <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="facilities" data-date="11_08" checked>
-              <span class="layer-name">Beschädigt</span>
-              <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="facilities" data-date="11_08" checked>
-              <span class="layer-name">Zerstört</span>
-              <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
-            </label>
-          </div>
-        </div>
-        <div class="legend-section-compact">
-          <div class="legend-category-compact">
-            <span class="toggle-icon-small">▼</span>
-            <label style="flex:1;">
               <input type="checkbox" class="category-toggle" data-category="transportation" data-date="11_08" checked>
-              <strong>Straßen & Transport</strong>
+              <strong>Infrastruktur</strong>
             </label>
           </div>
           <div class="legend-subcategory-compact" data-category="transportation">
@@ -641,7 +615,7 @@ function createCustomLayerControl(map) {
             <span class="toggle-icon-small">▼</span>
             <label style="flex:1;">
               <input type="checkbox" class="category-toggle" data-category="flood" data-date="11_08" checked>
-              <strong>Überschwemmung</strong>
+              <strong>Hydrographie</strong>
             </label>
           </div>
           <div class="legend-subcategory-compact" data-category="flood">
@@ -734,23 +708,8 @@ function createCustomLayerControl(map) {
       } else if (category === 'buildings') {
         var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
         if (this.checked) {
+          // Beide Layer-Gruppen einblenden
           map.addLayer(layerGroups.buildings);
-          // ✅ Setze alle Subtype-Checkboxen auf checked
-          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
-            subCheckbox.checked = true;
-            subCheckbox.dispatchEvent(new Event('change'));
-          });
-        } else {
-          map.removeLayer(layerGroups.buildings);
-          // ✅ Setze alle Subtype-Checkboxen auf unchecked
-          subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
-            subCheckbox.checked = false;
-            subCheckbox.dispatchEvent(new Event('change'));
-          });
-        }
-      } else if (category === 'facilities') {
-        var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
-        if (this.checked) {
           map.addLayer(layerGroups.facilities);
           // ✅ Setze alle Subtype-Checkboxen auf checked
           subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
@@ -758,6 +717,8 @@ function createCustomLayerControl(map) {
             subCheckbox.dispatchEvent(new Event('change'));
           });
         } else {
+          // Beide Layer-Gruppen ausblenden
+          map.removeLayer(layerGroups.buildings);
           map.removeLayer(layerGroups.facilities);
           // ✅ Setze alle Subtype-Checkboxen auf unchecked
           subcategory.querySelectorAll('.subtype-toggle').forEach(function(subCheckbox) {
@@ -806,33 +767,85 @@ function createCustomLayerControl(map) {
       var group = this.getAttribute('data-group');
       var checked = this.checked;
       
-      // ✅ Stelle sicher, dass die LayerGroup zur Karte hinzugefügt ist
-      if (!map.hasLayer(layerGroups[group])) {
-        map.addLayer(layerGroups[group]);
-      }
-      
-      // ✅ Verwende gespeicherte Layer-Arrays statt eachLayer
-      var layersToFilter = allLayersByGroup[group] || [];
-      
-      layersToFilter.forEach(function(layer) {
-        if (
-          layer.feature &&
-          layer.feature.properties &&
-          layer.feature.properties.damage_gra === type
-        ) {
-          if (checked) {
-            // Layer zur LayerGroup hinzufügen
-            if (!layerGroups[group].hasLayer(layer)) {
-              layerGroups[group].addLayer(layer);
-            }
-          } else {
-            // Layer aus LayerGroup entfernen
-            if (layerGroups[group].hasLayer(layer)) {
-              layerGroups[group].removeLayer(layer);
+      if (group === 'combined') {
+        // Für die kombinierte Gruppe (buildings + facilities)
+        // ✅ Stelle sicher, dass beide LayerGroups zur Karte hinzugefügt sind
+        if (!map.hasLayer(layerGroups.buildings)) {
+          map.addLayer(layerGroups.buildings);
+        }
+        if (!map.hasLayer(layerGroups.facilities)) {
+          map.addLayer(layerGroups.facilities);
+        }
+        
+        // ✅ Filtere beide Layer-Arrays
+        var buildingLayers = allLayersByGroup.buildings || [];
+        var facilityLayers = allLayersByGroup.facilities || [];
+        
+        buildingLayers.forEach(function(layer) {
+          if (
+            layer.feature &&
+            layer.feature.properties &&
+            layer.feature.properties.damage_gra === type
+          ) {
+            if (checked) {
+              if (!layerGroups.buildings.hasLayer(layer)) {
+                layerGroups.buildings.addLayer(layer);
+              }
+            } else {
+              if (layerGroups.buildings.hasLayer(layer)) {
+                layerGroups.buildings.removeLayer(layer);
+              }
             }
           }
+        });
+        
+        facilityLayers.forEach(function(layer) {
+          if (
+            layer.feature &&
+            layer.feature.properties &&
+            layer.feature.properties.damage_gra === type
+          ) {
+            if (checked) {
+              if (!layerGroups.facilities.hasLayer(layer)) {
+                layerGroups.facilities.addLayer(layer);
+              }
+            } else {
+              if (layerGroups.facilities.hasLayer(layer)) {
+                layerGroups.facilities.removeLayer(layer);
+              }
+            }
+          }
+        });
+      } else {
+        // Für andere Gruppen (transportation)
+        // ✅ Stelle sicher, dass die LayerGroup zur Karte hinzugefügt ist
+        if (!map.hasLayer(layerGroups[group])) {
+          map.addLayer(layerGroups[group]);
         }
-      });
+        
+        // ✅ Verwende gespeicherte Layer-Arrays statt eachLayer
+        var layersToFilter = allLayersByGroup[group] || [];
+        
+        layersToFilter.forEach(function(layer) {
+          if (
+            layer.feature &&
+            layer.feature.properties &&
+            layer.feature.properties.damage_gra === type
+          ) {
+            if (checked) {
+              // Layer zur LayerGroup hinzufügen
+              if (!layerGroups[group].hasLayer(layer)) {
+                layerGroups[group].addLayer(layer);
+              }
+            } else {
+              // Layer aus LayerGroup entfernen
+              if (layerGroups[group].hasLayer(layer)) {
+                layerGroups[group].removeLayer(layer);
+              }
+            }
+          }
+        });
+      }
       
       e.stopPropagation();
     });

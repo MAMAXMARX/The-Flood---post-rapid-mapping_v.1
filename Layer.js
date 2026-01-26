@@ -57,8 +57,8 @@ function loadUESGDataFromFile(map, allLayers) {
       var uesgLayer = L.geoJSON(featureCollection, {
         style: function(feature) {
           return {
-            color: '#00ffb3ff',
-            weight: 2,
+            color: 'rgb(11, 28, 23)',
+            weight: 1,
             opacity: 0.8,
             fillColor: '#00ffb37b',
             fillOpacity: 0.3

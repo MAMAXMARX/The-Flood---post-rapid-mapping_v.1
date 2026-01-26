@@ -109,9 +109,9 @@ function loadGeoJSON_19_07(url, style, layerName, description, map, allLayers, t
             // Stil-Logik: Reihenfolge ist wichtig!
             var polygonStyle = style;
             
-            // 1. Zuerst prüfen ob es eine Facility ist
+            // 1. Zuerst prüfen ob es eine Facility ist (jetzt mit Gebäude-Stil)
             if (feature.properties && feature.properties.damage_gra && targetGroup === layerGroups_19_07.facilities) {
-              polygonStyle = getFacilityStyle(feature.properties.damage_gra);
+              polygonStyle = getDamageStyle(feature.properties.damage_gra);
             }
             // 2. Dann prüfen ob es Flood-Daten mit spezifischer Notation sind
             else if (feature.properties && feature.properties.notation && 
@@ -148,9 +148,7 @@ function loadGeoJSON_19_07(url, style, layerName, description, map, allLayers, t
               popupContent += `<b>Info:</b> ${feature.properties.info}<br>`;
             }
             if (feature.properties && feature.properties.damage_gra) {
-              var damageColor = targetGroup === layerGroups_19_07.facilities ? 
-                getFacilityStyle(feature.properties.damage_gra).color : 
-                getDamageColor(feature.properties.damage_gra);
+              var damageColor = getDamageColor(feature.properties.damage_gra);
               popupContent += `<b style="color: ${damageColor}">● Schaden:</b> ${feature.properties.damage_gra}<br>`;
             }
             
@@ -216,6 +214,40 @@ function loadGeoJSON_19_07(url, style, layerName, description, map, allLayers, t
     });
 }
 
+// Style-Funktion für Gebäudeschäden (einheitlich für Buildings und Facilities)
+function getDamageStyle(damageGrade) {
+  switch(damageGrade) {
+    case 'Destroyed':
+      return {
+        color: '#3d0707',
+        fillColor: '#3d070758',
+        fillOpacity: 0.6,
+        weight: 2
+      };
+    case 'Damaged':
+      return {
+        color: '#ac3d3d',
+        fillColor: '#ac3d3d62',
+        fillOpacity: 0.6,
+        weight: 2
+      };
+    case 'Possibly damaged':
+      return {
+        color: '#ffb554',
+        fillColor: '#ffb55459',
+        fillOpacity: 0.5,
+        weight: 2
+      };
+    default:
+      return {
+        color: '#999999',
+        fillColor: '#999999',
+        fillOpacity: 0.3,
+        weight: 2
+      };
+  }
+}
+
 // Layer Control für 19.07 Daten erweitern
 function addLayerControl_19_07_ToExisting(controlDiv, map) {
   var content_19_07 = controlDiv.querySelector('[data-section-content="19_07"]');
@@ -231,60 +263,8 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
       <div class="legend-category-compact">
         <span class="toggle-icon-small">▼</span>
         <label>
-          <input type="checkbox" class="category-toggle" data-category="buildings_19_07" data-date="19_07">
-          <strong>Betroffene Gebäude</strong>
-        </label>
-      </div>
-      <div class="legend-subcategory-compact" data-category="buildings">
-        <label class="legend-item-compact">
-          <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="buildings" data-date="19_07">
-          <span class="layer-name">Mögl. beschädigt</span>
-          <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
-        </label>
-        <label class="legend-item-compact">
-          <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="buildings" data-date="19_07">
-          <span class="layer-name">Beschädigt</span>
-          <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
-        </label>
-        <label class="legend-item-compact">
-          <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="buildings" data-date="19_07">
-          <span class="layer-name">Zerstört</span>
-          <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
-        </label>
-      </div>
-    </div>
-    <div class="legend-section-compact">
-      <div class="legend-category-compact">
-        <span class="toggle-icon-small">▼</span>
-        <label>
-          <input type="checkbox" class="category-toggle" data-category="facilities_19_07" data-date="19_07">
-          <strong>Infrastruktur</strong>
-        </label>
-      </div>
-      <div class="legend-subcategory-compact" data-category="facilities">
-        <label class="legend-item-compact">
-          <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="facilities" data-date="19_07">
-          <span class="layer-name">Mögl. beschädigt</span>
-          <span class="legend-symbol-small" style="background: #FFA500; border: 2px solid #FFA500; opacity: 0.6;"></span>
-        </label>
-        <label class="legend-item-compact">
-          <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="facilities" data-date="19_07">
-          <span class="layer-name">Beschädigt</span>
-          <span class="legend-symbol-small" style="background: #FF6347; border: 2px solid #FF6347; opacity: 0.6;"></span>
-        </label>
-        <label class="legend-item-compact">
-          <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="facilities" data-date="19_07">
-          <span class="layer-name">Zerstört</span>
-          <span class="legend-symbol-small" style="background: #8B0000; border: 2px solid #8B0000; opacity: 0.6;"></span>
-        </label>
-      </div>
-    </div>
-    <div class="legend-section-compact">
-      <div class="legend-category-compact">
-        <span class="toggle-icon-small">▼</span>
-        <label>
           <input type="checkbox" class="category-toggle" data-category="flood_19_07" data-date="19_07">
-          <strong>Überschwemmung</strong>
+          <strong>Hydrographie</strong>
         </label>
       </div>
       <div class="legend-subcategory-compact" data-category="flood">
@@ -297,6 +277,32 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
           <input type="checkbox" class="layer-toggle" data-layer="floodTrace_19_07" data-date="19_07">
           <span class="layer-name">Überflutungsspur</span>
           <span class="legend-symbol-small" style="background: #00cccc; border: 1px solid #006666;"></span>
+        </label>
+      </div>
+    </div>
+    <div class="legend-section-compact">
+      <div class="legend-category-compact">
+        <span class="toggle-icon-small">▼</span>
+        <label>
+          <input type="checkbox" class="category-toggle" data-category="buildings_19_07" data-date="19_07">
+          <strong>Betroffene Gebäude</strong>
+        </label>
+      </div>
+      <div class="legend-subcategory-compact" data-category="buildings">
+        <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Possibly damaged" data-group="combined" data-date="19_07">
+          <span class="layer-name">Mögl. beschädigt</span>
+          <span class="legend-symbol-small" style="background: #ffb55459; border: 1px solid #ffb554;"></span>
+        </label>
+        <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Damaged" data-group="combined" data-date="19_07">
+          <span class="layer-name">Beschädigt</span>
+          <span class="legend-symbol-small" style="background: #ac3d3d62; border: 1px solid #ac3d3d;"></span>
+        </label>
+        <label class="legend-item-compact">
+          <input type="checkbox" class="subtype-toggle" data-type="Destroyed" data-group="combined" data-date="19_07">
+          <span class="layer-name">Zerstört</span>
+          <span class="legend-symbol-small" style="background: #3d070758; border: 1px solid #3d0707;"></span>
         </label>
       </div>
     </div>
@@ -319,15 +325,12 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
     checkbox.addEventListener('change', function(e) {
       var category = this.getAttribute('data-category').replace('_19_07', '');
       if (category === 'buildings') {
+        // Beide Layer-Gruppen (buildings und facilities) zusammen ein-/ausschalten
         if (this.checked) {
           map.addLayer(layerGroups_19_07.buildings);
-        } else {
-          map.removeLayer(layerGroups_19_07.buildings);
-        }
-      } else if (category === 'facilities') {
-        if (this.checked) {
           map.addLayer(layerGroups_19_07.facilities);
         } else {
+          map.removeLayer(layerGroups_19_07.buildings);
           map.removeLayer(layerGroups_19_07.facilities);
         }
       } else if (category === 'flood') {
@@ -348,22 +351,35 @@ function addLayerControl_19_07_ToExisting(controlDiv, map) {
     });
   });
 
-  // Subtype-Toggles für Gebäudeschäden/Infrastruktur (19.07)
+  // Subtype-Toggles für Gebäudeschäden (19.07) - jetzt für beide Gruppen
   content_19_07.querySelectorAll('.subtype-toggle[data-date="19_07"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function(e) {
       var type = this.getAttribute('data-type');
       var group = this.getAttribute('data-group');
       var checked = this.checked;
       
-      layerGroups_19_07[group].eachLayer(function(layer) {
-        if (layer.feature && layer.feature.properties && layer.feature.properties.damage_gra === type) {
-          if (checked) {
-            if (!map.hasLayer(layer)) map.addLayer(layer);
-          } else {
-            if (map.hasLayer(layer)) map.removeLayer(layer);
+      if (group === 'combined') {
+        // Beide Layer-Gruppen durchsuchen (buildings und facilities)
+        layerGroups_19_07.buildings.eachLayer(function(layer) {
+          if (layer.feature && layer.feature.properties && layer.feature.properties.damage_gra === type) {
+            if (checked) {
+              if (!map.hasLayer(layer)) map.addLayer(layer);
+            } else {
+              if (map.hasLayer(layer)) map.removeLayer(layer);
+            }
           }
-        }
-      });
+        });
+        
+        layerGroups_19_07.facilities.eachLayer(function(layer) {
+          if (layer.feature && layer.feature.properties && layer.feature.properties.damage_gra === type) {
+            if (checked) {
+              if (!map.hasLayer(layer)) map.addLayer(layer);
+            } else {
+              if (map.hasLayer(layer)) map.removeLayer(layer);
+            }
+          }
+        });
+      }
       e.stopPropagation();
     });
   });
