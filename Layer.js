@@ -137,69 +137,34 @@ function addUESGSectionToControl(legendControl, map) {
     uesgSection.className = 'legend-date-section';
     uesgSection.innerHTML = `
       <div class="legend-date-header" style="background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; color: #ffffff;">
-        <span class="section-toggle-icon">▶</span>
         <div class="date-header-content" style="flex: 1; color: #ffffff;">
-          <strong style="color: #ffffff;">Jahrhunderthochwasser - Überschwemmungsgebiet</strong>
-          <small style="display:block; color: #dddddd;">Veröffentlichung: 04/10/2021</small>
-          <small style="display:block; color: #dddddd;">Datenquelle: SGD Nord RLP / Geoportal RLP</small>
+          <strong style="color: #ffffff;">Jahrhunderthochwasser - Erwartetes Überschwemmungsgebiet</strong>
+          <small style="color: #dddddd;">Vorlaeufig sichergestellt (Par.76 Abs. 3 WHG)</small>
         </div>
-        <input type="checkbox" id="uesg-toggle-checkbox" class="layer-toggle" data-layer="uesg" style="width: 16px; height: 16px; margin-left: 8px; cursor: pointer;" title="Überschwemmungsgebiet ein-/ausblenden">
+        <input type="checkbox" id="uesg-toggle-checkbox" style="width: 16px; height: 16px; margin-left: 8px; cursor: pointer;">
       </div>
       <div class="legend-date-content" id="uesg-content" style="display: none; background: rgba(0, 0, 0, 0.3);">
-        <div class="legend-section-compact">
-          <div class="legend-category-compact">
-            <span class="toggle-icon-small">▼</span>
-            <label style="flex:1;">
-              <input type="checkbox" class="category-toggle" data-category="flood_uesg">
-              <strong>Hydrographie (CEMS 20/07/2021)</strong>
-            </label>
-          </div>
-          <div class="legend-subcategory-compact" data-category="flood_uesg">
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="hydrography_uesg" data-date="11_08">
-              <span class="layer-name">Gewässer</span>
-              <span class="legend-symbol-small" style="background: #0054a9; border: 2px solid #00172f;"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="floodedArea_uesg" data-date="11_08">
-              <span class="layer-name">Aktive Flut</span>
-              <span class="legend-symbol-small" style="background: rgb(34, 84, 224); border: 2px solid rgb(0, 54, 92);"></span>
-            </label>
-            <label class="legend-item-compact">
-              <input type="checkbox" class="layer-toggle" data-layer="floodTrace_uesg" data-date="11_08">
-              <span class="layer-name">Überflutungsspur</span>
-              <span class="legend-symbol-small" style="background: #0087c1; border: 2px solid #03484eff;"></span>
-            </label>
-          </div>
+        <div style="margin-top: 8px; padding: 6px; background: rgba(0, 0, 0, 0.5); border-radius: 4px; font-size: 10px; color: #dddddd; border: 1px solid #ffffff;">
+          <strong style="color: #ffffff;">Hinweis:</strong><br>
+          Zeigt die vorlaeufig sichergestellte Ueberschwemmungsflaeche der Ahrtal-Flut vom Juli 2021.<br><br>
+          <strong style="color: #ffffff;">Datenquelle:</strong> <a href="https://sgdnord.rlp.de" target="_blank" style="color: #47a9bc;">SGD Nord RLP</a> / 
+          <a href="https://www.geoportal.rlp.de" target="_blank" style="color: #47a9bc;">Geoportal RLP</a>
         </div>
       </div>
     `;
     
-    // Fuege die Sektion NACH dem zweiten CEMS-Layer ein (am Ende)
-    legendControl.appendChild(uesgSection);
+    // Fuege die Sektion am Anfang der Legende ein
+    var firstSection = legendControl.querySelector('.legend-date-section');
+    if (firstSection) {
+      legendControl.insertBefore(uesgSection, firstSection);
+    } else {
+      legendControl.appendChild(uesgSection);
+    }
     
-    // Event Listener für Header (Auf-/Zuklappen)
-    var uesgHeader = uesgSection.querySelector('.legend-date-header');
-    var uesgContent = uesgSection.querySelector('.legend-date-content');
-    var uesgToggleIcon = uesgHeader.querySelector('.section-toggle-icon');
-    
-    uesgHeader.addEventListener('click', function(e) {
-      // Nicht ausklappen, wenn auf Checkbox geklickt wurde
-      if (e.target.type === 'checkbox' || e.target.id === 'uesg-toggle-checkbox') return;
-      
-      if (uesgContent.style.display === 'none') {
-        uesgContent.style.display = 'block';
-        uesgToggleIcon.textContent = '▼';
-      } else {
-        uesgContent.style.display = 'none';
-        uesgToggleIcon.textContent = '▶';
-      }
-    });
-    
-    // Event Listener für UESG-Checkbox (Überschwemmungsgebiet Layer ein-/ausschalten)
-    var uesgCheckbox = document.getElementById('uesg-toggle-checkbox');
-    if (uesgCheckbox) {
-      uesgCheckbox.addEventListener('change', function(e) {
+    // Event Listener fuer Checkbox (Layer ein-/ausschalten)
+    var checkbox = document.getElementById('uesg-toggle-checkbox');
+    if (checkbox) {
+      checkbox.addEventListener('change', function() {
         var layer = window.uesgAhrLayer;
         var mapRef = window.ahrtalMap;
         
@@ -222,73 +187,6 @@ function addUESGSectionToControl(legendControl, map) {
           mapRef.removeLayer(layer);
           console.log('[UESG] Layer ausgeblendet');
         }
-        
-        // Verhindere, dass das Event weiter propagiert und den Header aufklappt
-        e.stopPropagation();
-      });
-    }
-    
-    // Event Listener für Hydrographie-Kategorie Toggle
-    var floodCategoryToggle = uesgSection.querySelector('.category-toggle[data-category="flood_uesg"]');
-    if (floodCategoryToggle) {
-      floodCategoryToggle.addEventListener('change', function(e) {
-        var mapRef = window.ahrtalMap;
-        if (!mapRef) return;
-        
-        // Hole die Layer-Gruppen aus dem globalen Scope
-        if (typeof layerGroups !== 'undefined') {
-          var subcategory = this.closest('.legend-section-compact').querySelector('.legend-subcategory-compact');
-          subcategory.querySelectorAll('.layer-toggle').forEach(function(subCheckbox) {
-            if (this.checked) {
-              subCheckbox.checked = true;
-              subCheckbox.dispatchEvent(new Event('change'));
-            } else {
-              subCheckbox.checked = false;
-              subCheckbox.dispatchEvent(new Event('change'));
-            }
-          }.bind(this));
-        }
-        e.stopPropagation();
-      });
-    }
-    
-    // Event Listener für einzelne Hydrographie-Layer
-    uesgSection.querySelectorAll('.layer-toggle[data-layer$="_uesg"]').forEach(function(checkbox) {
-      checkbox.addEventListener('change', function() {
-        var mapRef = window.ahrtalMap;
-        if (!mapRef) return;
-        
-        // Hole die Layer-Gruppen aus dem globalen Scope
-        if (typeof layerGroups !== 'undefined') {
-          var layerName = this.getAttribute('data-layer').replace('_uesg', '');
-          if (this.checked) {
-            mapRef.addLayer(layerGroups[layerName]);
-            console.log('[UESG] ' + layerName + ' eingeblendet');
-          } else {
-            mapRef.removeLayer(layerGroups[layerName]);
-            console.log('[UESG] ' + layerName + ' ausgeblendet');
-          }
-        }
-      });
-    });
-    
-    // Toggle Icon für Hydrographie-Unterkategorie
-    var floodCategory = uesgSection.querySelector('.legend-category-compact');
-    if (floodCategory) {
-      floodCategory.addEventListener('click', function(e) {
-        if (e.target.classList.contains('toggle-icon-small') || e.target.tagName === 'STRONG') {
-          var icon = this.querySelector('.toggle-icon-small');
-          var subcategory = this.parentElement.querySelector('.legend-subcategory-compact');
-          if (subcategory) {
-            if (subcategory.style.display === 'none' || subcategory.style.display === '') {
-              subcategory.style.display = 'block';
-              icon.textContent = '▼';
-            } else {
-              subcategory.style.display = 'none';
-              icon.textContent = '▶';
-            }
-          }
-        }
       });
     }
     
@@ -301,4 +199,133 @@ function addUESGSectionToControl(legendControl, map) {
 // Exportiere die Hauptfunktion
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { loadAhrtalLayers };
+}
+
+// ============================================
+// CEMS INFOBOX - 18/07/2021
+// ============================================
+
+function addCEMSInfoBox_19_07() {
+  setTimeout(function() {
+    // Finde den ersten CEMS Header (19_07)
+    var cemsHeader = document.querySelector('.legend-date-header[data-section="19_07"]');
+    if (!cemsHeader) {
+      console.warn('[CEMS Info] CEMS Header nicht gefunden');
+      return;
+    }
+
+    // Erstelle Container für Icon ÜBER der Checkbox
+    var checkbox = cemsHeader.querySelector('.section-layer-toggle');
+    if (checkbox) {
+      // Wrapper für Icon und Checkbox (vertikal gestapelt)
+      var iconCheckboxWrapper = document.createElement('div');
+      iconCheckboxWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 6px; margin-left: 8px;';
+      
+      var infoIcon = document.createElement('button');
+      infoIcon.className = 'cems-info-button-19-07';
+      infoIcon.innerHTML = 'ℹ';
+      infoIcon.style.cssText = 'background: transparent; border: 2px solid #ffffff; color: #ffffff; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; padding: 0; flex-shrink: 0; margin: 0; margin-bottom: 2px;';
+      infoIcon.title = 'Informationen';
+      
+      // Entferne Checkbox aus Header
+      cemsHeader.removeChild(checkbox);
+      
+      // Entferne margin/padding von Checkbox für perfekte Ausrichtung
+      checkbox.style.margin = '0';
+      checkbox.style.padding = '0';
+      
+      // Füge Icon und Checkbox in Wrapper ein
+      iconCheckboxWrapper.appendChild(infoIcon);
+      iconCheckboxWrapper.appendChild(checkbox);
+      
+      // Füge Wrapper zum Header hinzu
+      cemsHeader.appendChild(iconCheckboxWrapper);
+      
+      // Event Listener für Info-Icon
+      infoIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var infobox = document.getElementById('cems-infobox-19-07');
+        if (infobox) {
+          if (infobox.style.display === 'none' || infobox.style.display === '') {
+            infobox.style.display = 'block';
+          } else {
+            infobox.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    // Erstelle die Infobox als separates Leaflet Control
+    var infoboxDiv = document.createElement('div');
+    infoboxDiv.id = 'cems-infobox-19-07';
+    infoboxDiv.className = 'cems-infobox';
+    
+    // Setze Styles direkt inline für maximale Kontrolle
+    infoboxDiv.style.display = 'none';
+    infoboxDiv.style.background = 'rgba(0, 0, 0, 0.741)';
+    infoboxDiv.style.padding = '0';
+    infoboxDiv.style.borderRadius = '1px';
+    infoboxDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+    infoboxDiv.style.border = '2px solid #ffffff';
+    infoboxDiv.style.width = '300px';
+    infoboxDiv.style.minHeight = '150px';
+    infoboxDiv.style.maxHeight = '300px';
+    infoboxDiv.style.overflowY = 'auto';
+    infoboxDiv.style.overflowX = 'hidden';
+    infoboxDiv.style.fontFamily = 'Arial, sans-serif';
+    infoboxDiv.style.fontSize = '12px';
+    infoboxDiv.style.boxSizing = 'border-box';
+    
+    infoboxDiv.innerHTML = `
+      <div style="padding: 12px 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <strong style="color: #47a9bc; font-size: 13px;">CEMS Rapid Mapping V.1 - 18/07/2021</strong>
+          <button class="cems-infobox-close" style="background: transparent; border: none; color: #ffffff; font-size: 18px; cursor: pointer; font-weight: bold; line-height: 1; padding: 0;">×</button>
+        </div>
+        <p style="font-size: 12px; line-height: 1.6; color: #ffffff; margin: 0; text-align: left;">
+          Copernicus veröffentlichte die erste Schadensbewertung am 19. Juli 2021, vier Tage nach dem Flutereignis, und dokumentierte dabei die Lage vom 18. Juli, kurz nach dem Höhepunkt der Flutkatastrophe. Der Copernicus EMS Rapid Mapping Service wurde bereits am 13. Juli 2021 um 17:11 Uhr durch das deutsche Gemeinsame Melde- und Lagezentrum (GMLZ) aktiviert, nachdem die Region Rheinland-Pfalz von Starkregen getroffen worden war. Das Untersuchungsgebiet «AOI15» (Area of Interest 15) wurde zuvor von den zuständigen Behörden festgelegt und an Copernicus übermittelt. Dadurch analysierte das Rapid Mapping nur die Hälfte des betroffenen Gebietes. Die Erstbewertung basierte auf den ersten verfügbaren Satellitenbildern unter erschwerten Bedingungen. Dieses Produkt wurde später als «überflüssig» markiert, da eine aktualisierte Version vom 11. August 2021 verbesserte Datengrundlagen und deutlich präzisere Schadensinformationen bot.
+        </p>
+        <p style="font-size: 12px; line-height: 1.6; color: #ffffff; margin: 12px 0 0 0; text-align: left;">
+          [TEST-ABSATZ] Copernicus veröffentlichte die erste Schadensbewertung am 19. Juli 2021, vier Tage nach dem Flutereignis, und dokumentierte dabei die Lage vom 18. Juli, kurz nach dem Höhepunkt der Flutkatastrophe. Der Copernicus EMS Rapid Mapping Service wurde bereits am 13. Juli 2021 um 17:11 Uhr durch das deutsche Gemeinsame Melde- und Lagezentrum (GMLZ) aktiviert.
+        </p>
+        <p style="font-size: 12px; line-height: 1.6; color: #ffffff; margin: 12px 0 0 0; text-align: left;">
+          [TEST-ABSATZ 2] Das Untersuchungsgebiet «AOI15» (Area of Interest 15) wurde zuvor von den zuständigen Behörden festgelegt und an Copernicus übermittelt. Dadurch analysierte das Rapid Mapping nur die Hälfte des betroffenen Gebietes.
+        </p>
+      </div>
+    `;
+
+    // Erstelle Leaflet Control für die Infobox
+    var InfoBoxControl = L.Control.extend({
+      options: {
+        position: 'topleft'
+      },
+      onAdd: function(map) {
+        return infoboxDiv;
+      }
+    });
+
+    // Füge Control zur Karte hinzu
+    var map = window.ahrtalMap;
+    if (map) {
+      new InfoBoxControl().addTo(map);
+    }
+
+    // Event Listener für Close-Button
+    var closeButton = infoboxDiv.querySelector('.cems-infobox-close');
+    if (closeButton) {
+      closeButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        infoboxDiv.style.display = 'none';
+      });
+    }
+
+    console.log('[CEMS Info] ✅ Infobox für 18/07/2021 erstellt');
+  }, 1200);
+}
+
+// Rufe die Funktion auf
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', function() {
+    addCEMSInfoBox_19_07();
+  });
 }
