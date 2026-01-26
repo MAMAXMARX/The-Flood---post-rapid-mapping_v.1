@@ -82,7 +82,7 @@ function createBasemapControl(map, baseMaps) {
       
       // Monochrome Filter Option
       var monochromeItem = L.DomUtil.create('div', 'basemap-item basemap-filter', liste);
-      monochromeItem.innerHTML = '<input type="checkbox" id="monochromeToggle" checked style="margin-right: 6px; cursor: pointer;">Monochrome Filter';
+      monochromeItem.innerHTML = '<input type="checkbox" id="monochromeToggle" checked style="margin-right: 6px; cursor: pointer;">Filter';
       monochromeItem.style.display = 'flex';
       monochromeItem.style.alignItems = 'center';
       monochromeItem.style.borderTop = '1px solid #ffffff';
