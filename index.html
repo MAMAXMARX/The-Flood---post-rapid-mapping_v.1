@@ -59,7 +59,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       border: 2px solid #ffffff; /* Weißer Rand */
       width: 300px;
-      max-height: calc(100vh - 200px); /* Genug Platz für Leaflet Control */
+      max-height: calc(100vh - 450px); /* Deutlich reduziert - Platz für Infobox */
       overflow-y: auto;
       overflow-x: hidden;
       font-family: Arial, sans-serif;
@@ -75,6 +75,10 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       border: 2px solid #ffffff;
       width: 300px;
+      min-height: 150px;
+      max-height: 350px; /* Angepasst für bessere Sichtbarkeit */
+      overflow-y: auto;
+      overflow-x: hidden;
       font-family: Arial, sans-serif;
       font-size: 12px;
       box-sizing: border-box;
@@ -82,11 +86,11 @@
     
     /* Scrollbar für CEMS Infobox */
     .cems-infobox::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
     }
     
     .cems-infobox::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.3);
+      background: #00000070;
       border-radius: 3px;
     }
     

@@ -255,13 +255,17 @@ function addCEMSInfoBox_19_07() {
       });
     }
 
-    // Erstelle die Infobox als separates Leaflet Control
+    // Erstelle die Infobox als fixed Element (NICHT als Leaflet Control)
     var infoboxDiv = document.createElement('div');
     infoboxDiv.id = 'cems-infobox-19-07';
     infoboxDiv.className = 'cems-infobox';
     
-    // Setze Styles direkt inline für maximale Kontrolle
+    // Setze Styles direkt inline - FIXED POSITIONING
     infoboxDiv.style.display = 'none';
+    infoboxDiv.style.position = 'fixed';
+    infoboxDiv.style.bottom = '20px';
+    infoboxDiv.style.left = '10px';
+    infoboxDiv.style.zIndex = '1000';
     infoboxDiv.style.background = 'rgba(0, 0, 0, 0.741)';
     infoboxDiv.style.padding = '0';
     infoboxDiv.style.borderRadius = '1px';
@@ -269,7 +273,7 @@ function addCEMSInfoBox_19_07() {
     infoboxDiv.style.border = '2px solid #ffffff';
     infoboxDiv.style.width = '300px';
     infoboxDiv.style.minHeight = '150px';
-    infoboxDiv.style.maxHeight = '300px';
+    infoboxDiv.style.maxHeight = 'calc(100vh - 450px - 40px)'; // Custom Layer max-height - 20px Abstand oben/unten
     infoboxDiv.style.overflowY = 'auto';
     infoboxDiv.style.overflowX = 'hidden';
     infoboxDiv.style.fontFamily = 'Arial, sans-serif';
@@ -294,21 +298,8 @@ function addCEMSInfoBox_19_07() {
       </div>
     `;
 
-    // Erstelle Leaflet Control für die Infobox
-    var InfoBoxControl = L.Control.extend({
-      options: {
-        position: 'topleft'
-      },
-      onAdd: function(map) {
-        return infoboxDiv;
-      }
-    });
-
-    // Füge Control zur Karte hinzu
-    var map = window.ahrtalMap;
-    if (map) {
-      new InfoBoxControl().addTo(map);
-    }
+    // Füge Infobox direkt zum body hinzu (NICHT als Leaflet Control)
+    document.body.appendChild(infoboxDiv);
 
     // Event Listener für Close-Button
     var closeButton = infoboxDiv.querySelector('.cems-infobox-close');
@@ -319,7 +310,7 @@ function addCEMSInfoBox_19_07() {
       });
     }
 
-    console.log('[CEMS Info] ✅ Infobox für 18/07/2021 erstellt');
+    console.log('[CEMS Info] ✅ Infobox für 18/07/2021 erstellt (fixed position)');
   }, 1200);
 }
 
