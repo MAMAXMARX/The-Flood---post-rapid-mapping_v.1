@@ -48,73 +48,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var overlayMaps = {};
 
-  var layerControl = L.control.layers(baseMaps, overlayMaps, {
-    position: 'bottomleft',
-    collapsed: false
-  }).addTo(map);
-  
-  window.globalLayerControl = layerControl;
+  // Der alte Layer Control wird entfernt - wird durch Custom Control ersetzt
+  window.globalBaseMaps = baseMaps;
   var lastSelectedBaseLayer = esriSatellite;
   
-  setTimeout(function() {
-    var baseLayerLabels = document.querySelectorAll('.leaflet-control-layers-base label');
-    baseLayerLabels.forEach(function(label) {
-      label.addEventListener('click', function(e) {
-        var checkbox = this.querySelector('input[type="radio"]');
-        if (!checkbox) return;
-        var layerName = label.innerText.trim();
-        var selectedLayer = baseMaps[layerName];
-        if (!selectedLayer) return;
-        if (lastSelectedBaseLayer === selectedLayer && map.hasLayer(selectedLayer)) {
-          map.removeLayer(selectedLayer);
-          checkbox.checked = false;
-          lastSelectedBaseLayer = null;
-        } else {
-          lastSelectedBaseLayer = selectedLayer;
-        }
-      });
-    });
-  }, 100);
-  
-  setTimeout(function() {
-    var layerControlContainer = document.querySelector('.leaflet-control-layers-base');
-    if (layerControlContainer) {
-      var separator = document.createElement('div');
-      separator.className = 'leaflet-control-layers-separator';
-      var filterDiv = document.createElement('label');
-      filterDiv.style.display = 'flex';
-      filterDiv.style.alignItems = 'center';
-      filterDiv.style.gap = '6px';
-      filterDiv.style.padding = '4px 0';
-      filterDiv.style.cursor = 'pointer';
-      filterDiv.style.fontSize = '12px';
-      filterDiv.style.marginTop = '8px';
-      var checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = 'monochromeToggle';
-      checkbox.checked = true;
-      checkbox.style.cursor = 'pointer';
-      checkbox.style.width = '14px';
-      checkbox.style.height = '14px';
-      checkbox.style.margin = '0';
-      var label = document.createElement('span');
-      label.textContent = 'Monochrome Filter';
-      label.style.fontWeight = '500';
-      filterDiv.appendChild(checkbox);
-      filterDiv.appendChild(label);
-      layerControlContainer.parentNode.insertBefore(separator, layerControlContainer.nextSibling);
-      layerControlContainer.parentNode.insertBefore(filterDiv, separator.nextSibling);
-      var mapElement = document.getElementById('map');
-      mapElement.classList.add('monochrome');
-      checkbox.addEventListener('change', function() {
-        if (this.checked) {
-          mapElement.classList.add('monochrome');
-        } else {
-          mapElement.classList.remove('monochrome');
-        }
-      });
-    }
-  }, 100);
+  // Monochrome Filter initial aktivieren
+  var mapElement = document.getElementById('map');
+  mapElement.classList.add('monochrome');
 
   createCustomLayerControl(map);
   loadRapidMappingData(map, allLayers);
@@ -198,6 +138,14 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('✅ Dynamische Höhenberechnung aktiviert (20px Gap)');
     }
   }, 1000);
+  
+  // ============================================
+  // BASEMAP CONTROL (RECHTE SEITE)
+  // ============================================
+  
+  if (typeof createBasemapControl === 'function') {
+    createBasemapControl(map, baseMaps);
+  }
   
   // ============================================
   // ORTSCHAFTEN CONTROL (RECHTE SEITE)
