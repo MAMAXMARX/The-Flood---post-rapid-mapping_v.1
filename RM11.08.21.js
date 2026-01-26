@@ -519,7 +519,7 @@ function createCustomLayerControl(map) {
   titleDiv.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
       <div>
-        <div style="font-size: 18px; font-weight: bold; color: #47a9bc; line-height: 1.3;">The Flood</div>
+        <div style="font-size: 24px; font-weight: bold; color: #47a9bc; line-height: 1.3;">The Flood</div>
         <div style="font-size: 18px; font-weight: bold; color: #ffffff; line-height: 1.3;">[Post-] Rapid Mapping a Crisis</div>
       </div>
       <button id="info-button" style="background: transparent; border: 2px solid #ffffff; color: #ffffff; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; padding: 0; flex-shrink: 0; margin-top: 2px;" title="Über das Projekt">ℹ</button>
