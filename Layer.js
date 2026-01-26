@@ -258,13 +258,13 @@ function addCEMSInfoBox_19_07() {
     // Erstelle die Infobox als fixed Element (NICHT als Leaflet Control)
     var infoboxDiv = document.createElement('div');
     infoboxDiv.id = 'cems-infobox-19-07';
-    infoboxDiv.className = 'cems-infobox';
+    infoboxDiv.className = 'cems-infobox leaflet-control';
     
     // Setze Styles direkt inline - FIXED POSITIONING
     infoboxDiv.style.display = 'none';
     infoboxDiv.style.position = 'fixed';
-    infoboxDiv.style.bottom = '20px';
-    infoboxDiv.style.left = '10px';
+    infoboxDiv.style.bottom = '28px';
+    infoboxDiv.style.left = '28px';
     infoboxDiv.style.zIndex = '1000';
     infoboxDiv.style.background = 'rgba(0, 0, 0, 0.741)';
     infoboxDiv.style.padding = '0';
@@ -273,7 +273,7 @@ function addCEMSInfoBox_19_07() {
     infoboxDiv.style.border = '2px solid #ffffff';
     infoboxDiv.style.width = '300px';
     infoboxDiv.style.minHeight = '150px';
-    infoboxDiv.style.maxHeight = 'calc(100vh - 450px - 40px)'; // Custom Layer max-height - 20px Abstand oben/unten
+    infoboxDiv.style.maxHeight = '300px';    
     infoboxDiv.style.overflowY = 'auto';
     infoboxDiv.style.overflowX = 'hidden';
     infoboxDiv.style.fontFamily = 'Arial, sans-serif';
@@ -288,12 +288,6 @@ function addCEMSInfoBox_19_07() {
         </div>
         <p style="font-size: 12px; line-height: 1.6; color: #ffffff; margin: 0; text-align: left;">
           Copernicus veröffentlichte die erste Schadensbewertung am 19. Juli 2021, vier Tage nach dem Flutereignis, und dokumentierte dabei die Lage vom 18. Juli, kurz nach dem Höhepunkt der Flutkatastrophe. Der Copernicus EMS Rapid Mapping Service wurde bereits am 13. Juli 2021 um 17:11 Uhr durch das deutsche Gemeinsame Melde- und Lagezentrum (GMLZ) aktiviert, nachdem die Region Rheinland-Pfalz von Starkregen getroffen worden war. Das Untersuchungsgebiet «AOI15» (Area of Interest 15) wurde zuvor von den zuständigen Behörden festgelegt und an Copernicus übermittelt. Dadurch analysierte das Rapid Mapping nur die Hälfte des betroffenen Gebietes. Die Erstbewertung basierte auf den ersten verfügbaren Satellitenbildern unter erschwerten Bedingungen. Dieses Produkt wurde später als «überflüssig» markiert, da eine aktualisierte Version vom 11. August 2021 verbesserte Datengrundlagen und deutlich präzisere Schadensinformationen bot.
-        </p>
-        <p style="font-size: 12px; line-height: 1.6; color: #ffffff; margin: 12px 0 0 0; text-align: left;">
-          [TEST-ABSATZ] Copernicus veröffentlichte die erste Schadensbewertung am 19. Juli 2021, vier Tage nach dem Flutereignis, und dokumentierte dabei die Lage vom 18. Juli, kurz nach dem Höhepunkt der Flutkatastrophe. Der Copernicus EMS Rapid Mapping Service wurde bereits am 13. Juli 2021 um 17:11 Uhr durch das deutsche Gemeinsame Melde- und Lagezentrum (GMLZ) aktiviert.
-        </p>
-        <p style="font-size: 12px; line-height: 1.6; color: #ffffff; margin: 12px 0 0 0; text-align: left;">
-          [TEST-ABSATZ 2] Das Untersuchungsgebiet «AOI15» (Area of Interest 15) wurde zuvor von den zuständigen Behörden festgelegt und an Copernicus übermittelt. Dadurch analysierte das Rapid Mapping nur die Hälfte des betroffenen Gebietes.
         </p>
       </div>
     `;
