@@ -588,5 +588,36 @@
   
   <!-- Dann die Hauptanwendung -->
   <script src="app.js"></script>
+  
+  <!-- Auto-Refresh bei Inaktivität (10 Minuten) -->
+  <script>
+    (function() {
+      var inactivityTime = 10 * 60 * 1000; // 10 Minuten in Millisekunden
+      var refreshTimer;
+      
+      function resetTimer() {
+        // Lösche alten Timer
+        clearTimeout(refreshTimer);
+        
+        // Starte neuen Timer
+        refreshTimer = setTimeout(function() {
+          console.log('[Auto-Refresh] 10 Minuten Inaktivität - Seite wird neu geladen');
+          window.location.reload();
+        }, inactivityTime);
+      }
+      
+      // Event Listener für Benutzer-Aktivität
+      var events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+      
+      events.forEach(function(event) {
+        document.addEventListener(event, resetTimer, true);
+      });
+      
+      // Starte Timer beim Laden der Seite
+      resetTimer();
+      
+      console.log('[Auto-Refresh] Aktiviert - Reload nach 10 Minuten Inaktivität');
+    })();
+  </script>
 </body>
 </html>
