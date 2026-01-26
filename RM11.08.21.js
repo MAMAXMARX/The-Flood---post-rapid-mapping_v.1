@@ -297,8 +297,20 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
               })];
             }
             
-            var damageGrade = feature.properties ? feature.properties.damage_gra : null;
-            var lineStyle = getTransportationStyle(damageGrade);
+            // Bestimme den Style basierend auf der Zielgruppe
+            var lineStyle;
+            if (targetGroup === layerGroups.hydrography) {
+              // Spezial-Style für Hydrographie (Flüsse/Bäche)
+              lineStyle = style || {
+                color: '#00172f',
+                weight: 2,
+                opacity: 0.7
+              };
+            } else {
+              // Transportation-Style für Straßen
+              var damageGrade = feature.properties ? feature.properties.damage_gra : null;
+              lineStyle = getTransportationStyle(damageGrade);
+            }
             
             leafletCoords.forEach(function(lineCoords) {
               var polyline = L.polyline(lineCoords, lineStyle);
@@ -622,17 +634,17 @@ function createCustomLayerControl(map) {
             <label class="legend-item-compact">
               <input type="checkbox" class="layer-toggle" data-layer="hydrography" data-date="11_08">
               <span class="layer-name">Gewässer</span>
-              <span class="legend-symbol-small" style="background: #6699cc; border: 1px solid #0066cc;"></span>
+              <span class="legend-symbol-small" style="background: #0054a9; border: 2px solid #00172f;"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="layer-toggle" data-layer="floodedArea" data-date="11_08" checked>
               <span class="layer-name">Aktive Flut</span>
-              <span class="legend-symbol-small" style="background: #3399ff; border: 2px solid #0066cc;"></span>
+              <span class="legend-symbol-small" style="background: rgb(34, 84, 224); border: 2px solid rgb(0, 54, 92);"></span>
             </label>
             <label class="legend-item-compact">
               <input type="checkbox" class="layer-toggle" data-layer="floodTrace" data-date="11_08" checked>
               <span class="layer-name">Überflutungsspur</span>
-              <span class="legend-symbol-small" style="background: #00cccc; border: 1px solid #006666;"></span>
+              <span class="legend-symbol-small" style="background: #0087c1; border: 2px solid #03484eff;"></span>
             </label>
           </div>
         </div>
