@@ -514,6 +514,14 @@ function loadRapidMappingData(map, allLayers) {
 
 // Erweiterte Layer Control mit Hierarchie erstellen
 function createCustomLayerControl(map) {
+  // Erstelle Container für Titel
+  var titleDiv = L.DomUtil.create('div', 'legend-title-container');
+  titleDiv.innerHTML = `
+    <div style="font-size: 26px; font-weight: bold; color: #47a9bc; line-height: 1.3;">The Flood</div>
+    <div style="font-size: 18px; font-weight: bold; color: #ffffff; line-height: 1.3;">[Post-] Rapid Mapping a Crisis</div>
+  `;
+  
+  // Erstelle Layer Control
   var controlDiv = L.DomUtil.create('div', 'custom-layer-control');
   controlDiv.innerHTML = `
     <div class="legend-date-section">
@@ -919,15 +927,27 @@ function createCustomLayerControl(map) {
     });
   });
 
+  // Titel Control (separater Container)
+  var TitleControl = L.Control.extend({
+    options: {
+      position: 'topleft'
+    },
+    onAdd: function(map) {
+      return titleDiv;
+    }
+  });
+
+  // Layer Control
   var CustomControl = L.Control.extend({
     options: {
-      position: 'topleft'  // ✅ Links statt rechts
+      position: 'topleft'
     },
     onAdd: function(map) {
       return controlDiv;
     }
   });
 
+  new TitleControl().addTo(map);
   new CustomControl().addTo(map);
 }
 

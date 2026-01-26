@@ -139,7 +139,7 @@ function addUESGSectionToControl(legendControl, map) {
       <div class="legend-date-header" style="background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; color: #ffffff;">
         <span class="section-toggle-icon">▶</span>
         <div class="date-header-content" style="flex: 1; color: #ffffff;">
-          <strong style="color: #ffffff;">Jahrhunderthochwasser - Erwartetes Überschwemmungsgebiet</strong>
+          <strong style="color: #ffffff;">Jahrhunderthochwasser - Überschwemmungsgebiet</strong>
           <small style="display:block; color: #dddddd;">Veröffentlichung: 04/10/2021</small>
           <small style="display:block; color: #dddddd;">Datenquelle: SGD Nord RLP / Geoportal RLP</small>
         </div>
@@ -175,13 +175,8 @@ function addUESGSectionToControl(legendControl, map) {
       </div>
     `;
     
-    // Fuege die Sektion am Anfang der Legende ein
-    var firstSection = legendControl.querySelector('.legend-date-section');
-    if (firstSection) {
-      legendControl.insertBefore(uesgSection, firstSection);
-    } else {
-      legendControl.appendChild(uesgSection);
-    }
+    // Fuege die Sektion NACH dem zweiten CEMS-Layer ein (am Ende)
+    legendControl.appendChild(uesgSection);
     
     // Event Listener für Header (Auf-/Zuklappen)
     var uesgHeader = uesgSection.querySelector('.legend-date-header');
