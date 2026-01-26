@@ -12,14 +12,30 @@ function createBasemapControl(map, baseMaps) {
     onAdd: function(map) {
       var container = L.DomUtil.create('div', 'basemap-control');
       
+      // Refresh-Button als separate Box
+      var refreshButton = L.DomUtil.create('div', 'basemap-refresh', container);
+      refreshButton.innerHTML = '<strong>↻ Neu laden</strong>';
+      refreshButton.style.cssText = 'padding: 8px; text-align: left; cursor: pointer; font-size: 12px; color: #ffffff; background: rgba(0, 0, 0, 0.741); margin-bottom: 20px; border: 2px solid #ffffff; border-radius: 1px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);';
+      refreshButton.title = 'Seite neu laden';
+      
+      // Event Listener für Refresh
+      L.DomEvent.on(refreshButton, 'click', function(e) {
+        L.DomEvent.stopPropagation(e);
+        window.location.reload();
+      });
+      
+      // Wrapper für Karten-Box (Header + Liste)
+      var kartenBox = L.DomUtil.create('div', 'basemap-karten-box', container);
+      kartenBox.style.cssText = 'background: rgba(0, 0, 0, 0.741); border: 2px solid #ffffff; border-radius: 1px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); overflow: hidden;';
+      
       // Header mit Toggle-Icon
-      var header = L.DomUtil.create('div', 'basemap-header', container);
+      var header = L.DomUtil.create('div', 'basemap-header', kartenBox);
       header.innerHTML = '<span class="basemap-toggle-icon">▼</span><strong>Karten</strong>';
       header.style.cursor = 'pointer';
       header.title = 'Ein-/Ausklappen';
       
       // Liste (scrollbar)
-      var liste = L.DomUtil.create('div', 'basemap-liste', container);
+      var liste = L.DomUtil.create('div', 'basemap-liste', kartenBox);
       
       // Basemaps mit besserem Namen
       var basemapNames = {
