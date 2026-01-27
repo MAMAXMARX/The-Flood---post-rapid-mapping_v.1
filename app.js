@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // Neue Koordinaten & Zoom 15 - Zoom Control deaktiviert
   var map = L.map('map', {
-    zoomControl: false  // ✅ Zoom Control entfernt
+    zoomControl: false,  // ✅ Zoom Control entfernt
+    minZoom: 11          // ✅ Maximales Herauszoomen bis Zoom 11
   }).setView([50.47296726489117, 6.954176637076611], 15);
 
   // ============================================

@@ -22,36 +22,39 @@ var allLayersByGroup = {
   transportation: []
 };
 
+// ✅ Speichere ursprüngliche Gewichte für Zoom-Anpassung
+var baseWeights = {};
+
 function getFacilityStyle(damageGrade) {
   // Einheitliche Farbcodierung für Facilities (Polygone) wie bei Gebäuden
   switch(damageGrade) {
     case 'Destroyed':
       return {
-        color: '#3d0707',
-        fillColor: '#3d070758',
-        fillOpacity: 0.6,
-        weight: 2
+        color: '#000000',
+        fillColor: '#3d0707',
+        fillOpacity: 0.85,
+        weight: 0.5
       };
     case 'Damaged':
       return {
-        color: '#ac3d3d',
-        fillColor: '#ac3d3d62',
-        fillOpacity: 0.6,
-        weight: 2
+        color: '#000000',
+        fillColor: '#ac3d3d',
+        fillOpacity: 0.85,
+        weight: 0.5
       };
     case 'Possibly damaged':
       return {
-        color: '#ffb554',
-        fillColor: '#ffb55459',
-        fillOpacity: 0.5,
-        weight: 2
+        color: '#000000',
+        fillColor: '#ffb554',
+        fillOpacity: 0.85,
+        weight: 0.5
       };
     default:
       return {
-        color: '#999999',
+        color: '#000000',
         fillColor: '#999999',
-        fillOpacity: 0.3,
-        weight: 2
+        fillOpacity: 0.85,
+        weight: 0.5
       };
   }
 }
@@ -59,11 +62,11 @@ function getFacilityStyle(damageGrade) {
 function getDamageColor(damageGrade) {
   switch(damageGrade) {
     case 'Destroyed':
-      return '#3d070758';
+      return '#3d0707';
     case 'Damaged':
-      return '#ac3d3d62';
+      return '#ac3d3d';
     case 'Possibly damaged':
-      return '#ffb55459';
+      return '#ffb554';
     default:
       return '#999999';
   }
@@ -182,6 +185,9 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             // ✅ WICHTIG: Feature-Referenz speichern für späteres Filtern
             polygon.feature = feature;
             
+            // ✅ Speichere ursprüngliches Gewicht für Zoom-Anpassung
+            baseWeights[L.stamp(polygon)] = polygonStyle.weight || 2;
+            
             // Zu Gruppe hinzufügen basierend auf Notation oder targetGroup
             if (feature.properties && feature.properties.notation === 'Flooded area') {
               polygon.addTo(layerGroups.floodedArea);
@@ -244,14 +250,17 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
             
             var circleMarker = L.circleMarker(latLng, {
               radius: 5,
-              color: pointColor,
+              color: '#000000',
               fillColor: pointColor,
-              fillOpacity: 0.8,
-              weight: 1
+              fillOpacity: 0.85,
+              weight: 0.5
             });
             
             // ✅ WICHTIG: Feature-Referenz speichern für späteres Filtern
             circleMarker.feature = feature;
+            
+            // ✅ Speichere ursprüngliches Gewicht für Zoom-Anpassung
+            baseWeights[L.stamp(circleMarker)] = 0.5;
             
             // Zu entsprechender Gruppe hinzufügen basierend auf Schadensgrad
             if (targetGroup) {
@@ -317,6 +326,9 @@ function loadGeoJSON(url, style, layerName, description, map, allLayers, targetG
               
               // ✅ WICHTIG: Feature-Referenz speichern für späteres Filtern
               polyline.feature = feature;
+              
+              // ✅ Speichere ursprüngliches Gewicht für Zoom-Anpassung
+              baseWeights[L.stamp(polyline)] = lineStyle.weight || 2;
               
               if (targetGroup) {
                 polyline.addTo(targetGroup);
@@ -510,6 +522,9 @@ function loadRapidMappingData(map, allLayers) {
     allLayers,
     layerGroups.hydrography
   );
+  
+  // ✅ Aktiviere dynamische Zoom-Skalierung
+  setupDynamicZoomScaling(map);
 }
 
 // Erweiterte Layer Control mit Hierarchie erstellen
@@ -1050,4 +1065,50 @@ function addLayerWithHierarchy(map) {
   if (map.hasLayer(layerGroups.facilities)) map.addLayer(layerGroups.facilities);
   if (map.hasLayer(layerGroups.transportation)) map.addLayer(layerGroups.transportation);
   if (map.hasLayer(layerGroups.buildings)) map.addLayer(layerGroups.buildings);
+}
+
+// ============================================
+// DYNAMISCHE ZOOM-ANPASSUNG DER LAYER-GEWICHTE
+// Layer werden beim Rauszoomen proportional kleiner
+// ============================================
+
+function setupDynamicZoomScaling(map) {
+  var baseZoom = 16; // Referenz-Zoom (ab hier werden Layer beim Rauszoomen verkleinert)
+  
+  map.on('zoomend', function() {
+    var currentZoom = map.getZoom();
+    
+    // Berechne Skalierungsfaktor
+    // Bei Zoom 16: Faktor = 1.0 (100%)
+    // Bei Zoom 15: Faktor ≈ 0.7 (70%)
+    // Bei Zoom 14: Faktor ≈ 0.49 (49%)
+    // Bei Zoom 13: Faktor ≈ 0.34 (34%)
+    // Bei Zoom 12: Faktor ≈ 0.24 (24%)
+    // Bei Zoom 11: Faktor ≈ 0.17 (17%)
+    // Bei Zoom 17+: Faktor > 1.0 (Vergrößerung)
+    var zoomFactor = Math.pow(0.7, baseZoom - currentZoom);
+    
+    // Durchlaufe alle Layer-Gruppen
+    Object.values(layerGroups).forEach(function(group) {
+      group.eachLayer(function(layer) {
+        if (layer instanceof L.Path) { // Polygone, Polylines, CircleMarker
+          var layerId = L.stamp(layer);
+          
+          // Hole ursprüngliches Gewicht
+          if (baseWeights[layerId]) {
+            var newWeight = baseWeights[layerId] * zoomFactor;
+            
+            // Mindestgewicht 0.2px, Maximum 6px
+            newWeight = Math.max(0.2, Math.min(6, newWeight));
+            
+            layer.setStyle({ weight: newWeight });
+          }
+        }
+      });
+    });
+    
+    console.log('🔍 Zoom ' + currentZoom + ' → Skalierungsfaktor: ' + zoomFactor.toFixed(2));
+  });
+  
+  console.log('✅ Dynamische Zoom-Skalierung aktiviert (Basis: Zoom ' + baseZoom + ', Min-Zoom: 11)');
 }
